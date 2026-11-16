@@ -1,0 +1,6 @@
+{
+  "phase": "voting",
+  "rosterLocked": true,
+  "players": [{ "id": "p1", "name": "Ada", "role": "voter", "connected": true, "submitted": false }],
+  "pitches": []
+}

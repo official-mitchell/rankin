@@ -7,7 +7,7 @@ export default defineConfig({
       {
         test: {
           name: "unit",
-          include: ["shared/**/*.test.ts", "worker/**/*.unit.test.ts"],
+          include: ["shared/**/*.test.ts", "client/**/*.test.ts", "scripts/**/*.test.ts", "worker/**/*.unit.test.ts"],
         },
       },
       defineWorkersProject({
@@ -18,6 +18,7 @@ export default defineConfig({
             workers: {
               isolatedStorage: false,
               wrangler: { configPath: "./wrangler.jsonc" },
+              miniflare: { bindings: { CREATE_KEY: "test-create-key-xx" } },
             },
           },
         },

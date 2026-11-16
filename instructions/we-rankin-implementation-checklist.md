@@ -151,12 +151,12 @@ Produces: pure, tested types/config/stats/tally/ballot functions used by worker 
 Requires: 1.1 complete
 Produces: `shared/types.ts`, `shared/config.ts`
 
-- [ ] 1. Types: `Phase`, `PitchStatus`, `CategoryId`, `Player{role: voter|spectator, removed}`, `Pitch`, `Score`, `Ballot{order, placed, submitted}`, `Results`, `ClientView`, message unions (filled in 4.4)
-- [ ] 2. `config.ts` categories: Compellingness 1–5, Funniness 1–5, Hotness 1–10 with total weight (Hotness ×0.5)
-- [ ] 3. `config.ts` chips: 7 Investable + 7 Cautious from PRD seed
-- [ ] 4. Constants: name 1–24 chars, title 1–80, code length 6, code alphabet without `0 O 1 I L`
-- [ ] 5. 🧪 Max score total = 15
-- [ ] 6. 🧪 Chip groups each contain 5–8 chips with unique ids
+- [x] 1. Types: `Phase`, `PitchStatus`, `CategoryId`, `Player{role: voter|spectator, removed}`, `Pitch`, `Score`, `Ballot{order, placed, submitted}`, `Results`, `ClientView`, message unions (filled in 4.4)
+- [x] 2. `config.ts` categories: Compellingness 1–5, Funniness 1–5, Hotness 1–10 with total weight (Hotness ×0.5)
+- [x] 3. `config.ts` chips: 7 Investable + 7 Cautious from PRD seed
+- [x] 4. Constants: name 1–24 chars, title 1–80, code length 6, code alphabet without `0 O 1 I L`
+- [x] 5. 🧪 Max score total = 15
+- [x] 6. 🧪 Chip groups each contain 5–8 chips with unique ids
 
 (no observability required: pure data)
 
@@ -164,13 +164,13 @@ Produces: `shared/types.ts`, `shared/config.ts`
 Requires: 2.1 complete
 Produces: `mean`, `popSD`, `min`, `max`, `percentile`, `scoreTotal`, `competitionRank`
 
-- [ ] 1. Implement mean, population SD, min, max
-- [ ] 2. Implement percentile via linear interpolation between closest ranks (numpy default); use for 25th/75th
-- [ ] 3. Implement `scoreTotal` = C mean + F mean + H mean ÷ 2
-- [ ] 4. Implement `competitionRank` (1,2,2,4 on ties)
-- [ ] 5. 🧪 Hand-computed fixtures with derivation comments (n=1, n=2, n=5, ties)
-- [ ] 6. 🧪 Empty input returns `null`, never `NaN`
-- [ ] 7. 🧪 Single vote → SD 0, Q1=Q3=value
+- [x] 1. Implement mean, population SD, min, max
+- [x] 2. Implement percentile via linear interpolation between closest ranks (numpy default); use for 25th/75th
+- [x] 3. Implement `scoreTotal` = C mean + F mean + H mean ÷ 2
+- [x] 4. Implement `competitionRank` (1,2,2,4 on ties)
+- [x] 5. 🧪 Hand-computed fixtures with derivation comments (n=1, n=2, n=5, ties)
+- [x] 6. 🧪 Empty input returns `null`, never `NaN`
+- [x] 7. 🧪 Single vote → SD 0, Q1=Q3=value
 
 (no observability required: pure functions)
 
@@ -178,13 +178,13 @@ Produces: `mean`, `popSD`, `min`, `max`, `percentile`, `scoreTotal`, `competitio
 Requires: 2.2 complete
 Produces: `borda()`, `rankPitches()`
 
-- [ ] 1. `borda`: per pitch, mean over counted ballots containing it of (n − pos) ÷ (n − 1), pos 1-indexed
-- [ ] 2. Ballots with n < 2 contribute no points; pitch with no contributing ballots → Borda 0
-- [ ] 3. Tie-break order: more 1st-place votes → higher score total → shared rank
-- [ ] 4. 🧪 Fixture: 5 voters (2×A>B>C, 2×C>B>A, 1×B>A>C) → B 0.60, A 0.50, C 0.40
-- [ ] 5. 🧪 Tie fixtures: broken by 1st-place count; by score total; unresolved → shared rank
-- [ ] 6. 🧪 Presenter-excluded fixture: ballots of different lengths, expected values hand-derived
-- [ ] 7. 🧪 n=1 ballot contributes nothing
+- [x] 1. `borda`: per pitch, mean over counted ballots containing it of (n − pos) ÷ (n − 1), pos 1-indexed
+- [x] 2. Ballots with n < 2 contribute no points; pitch with no contributing ballots → Borda 0
+- [x] 3. Tie-break order: more 1st-place votes → higher score total → shared rank
+- [x] 4. 🧪 Fixture: 5 voters (2×A>B>C, 2×C>B>A, 1×B>A>C) → B 0.60, A 0.50, C 0.40
+- [x] 5. 🧪 Tie fixtures: broken by 1st-place count; by score total; unresolved → shared rank
+- [x] 6. 🧪 Presenter-excluded fixture: ballots of different lengths, expected values hand-derived
+- [x] 7. 🧪 n=1 ballot contributes nothing
 
 (no observability required: pure functions)
 
@@ -192,14 +192,14 @@ Produces: `borda()`, `rankPitches()`
 Requires: 2.1 complete
 Produces: `eligiblePitches`, `ballotComplete`, `applyNewPitch`, `applyRemovePitch`, `applyMove`, `applyPlace`, `missingItems`
 
-- [ ] 1. `eligiblePitches(player, pitches)` excludes pitches whose presenter is that player
-- [ ] 2. `applyNewPitch`: append to `order`, not in `placed`
-- [ ] 3. `applyMove(order, pitchId, toIndex)`: move, add `pitchId` to `placed`
-- [ ] 4. `applyPlace(pitchId)`: add to `placed`, order unchanged
-- [ ] 5. `applyRemovePitch`: drop from `order` and `placed`
-- [ ] 6. `missingItems`: all unscored categories per eligible pitch + unplaced NEW pitches
-- [ ] 7. `ballotComplete` = `missingItems` empty and `order` equals eligible set
-- [ ] 8. 🧪 Table tests for each function incl. out-of-range `toIndex` (clamps) and idempotent replay
+- [x] 1. `eligiblePitches(player, pitches)` excludes pitches whose presenter is that player
+- [x] 2. `applyNewPitch`: append to `order`, not in `placed`
+- [x] 3. `applyMove(order, pitchId, toIndex)`: move, add `pitchId` to `placed`
+- [x] 4. `applyPlace(pitchId)`: add to `placed`, order unchanged
+- [x] 5. `applyRemovePitch`: drop from `order` and `placed`
+- [x] 6. `missingItems`: all unscored categories per eligible pitch + unplaced NEW pitches
+- [x] 7. `ballotComplete` = `missingItems` empty and `order` equals eligible set
+- [x] 8. 🧪 Table tests for each function incl. out-of-range `toIndex` (clamps) and idempotent replay
 
 (no observability required: pure functions)
 
@@ -207,12 +207,12 @@ Produces: `eligiblePitches`, `ballotComplete`, `applyNewPitch`, `applyRemovePitc
 Requires: 2.2, 2.3, 2.4 complete
 Produces: `computeResults(snapshot)`
 
-- [ ] 1. Counted = voters ∩ submitted ∩ not removed; all others listed as voided
-- [ ] 2. Per pitch: Borda, Borda rank, 1st-place count, per-category stats from counted voters, score total, score rank
-- [ ] 3. Disagreement flag when |Borda rank − score rank| ≥ 2 (with direction)
-- [ ] 4. 🧪 End-to-end fixture: 6 voters, 1 voided, 1 presenter, 4 pitches; expected JSON hand-derived
-- [ ] 5. 🧪 Deterministic: identical input → deep-equal output
-- [ ] 6. 🧪 Voided voter's scores do not alter any mean
+- [x] 1. Counted = voters ∩ submitted ∩ not removed; all others listed as voided
+- [x] 2. Per pitch: Borda, Borda rank, 1st-place count, per-category stats from counted voters, score total, score rank
+- [x] 3. Disagreement flag when |Borda rank − score rank| ≥ 2 (with direction)
+- [x] 4. 🧪 End-to-end fixture: 6 voters, 1 voided, 1 presenter, 4 pitches; expected JSON hand-derived
+- [x] 5. 🧪 Deterministic: identical input → deep-equal output
+- [x] 6. 🧪 Voided voter's scores do not alter any mean
 
 (no observability required: pure functions)
 
@@ -229,14 +229,14 @@ Requires: 1.1 complete
 Produces: client CSS variables copied from `instructions/we-rankin-tokens.css`, bundled Inter + Russo One
 Authority: style guide §3 and §4. Values live in the tokens file; this list is the adoption check.
 
-- [ ] 1. Copy `we-rankin-tokens.css` primitives and semantic tokens into the client (`--bg-*`, `--text-*`, `--border-*`, `--cat-*`, `--chip-*`, `--medal-*`, type, space, radius, `--tap-min` 48 / `--tap-primary` 56, motion). Do not keep Style Guide v0 light surfaces (#ffffff / #14171f) or v0 category gradients (blue, violet→pink, red→yellow).
-- [ ] 2. Category accents from tokens (guide §4, D1 = A): Compellingness ice (`--cat-comp-*`), Funniness gold (`--cat-fun-*`), Hotness red (`--cat-hot-*`). Selected score text is `--text-ink`. Enamel button text is flat `--text-gold` (gold-100), not a gold gradient.
-- [ ] 3. Type scale from tokens: numeral 40, title 28 (header wordmark 24), card-title 20, body 16, label floor 13. 4px spacing grid; page gutter 16 (12 at ≤380px). Radius 16 on panels. Russo One is weight 400 only (`font-synthesis: none`).
-- [ ] 4. Bundle Inter (400/500/600/700) and Russo One (400) locally — `@fontsource/inter` and `@fontsource/russo-one`, or the woff2 files named in the tokens file. No CDN.
-- [ ] 5. Base page matches tokens file: canvas background, Inter body, paper-grain noise tiled at 256px, `prefers-reduced-motion` collapsed to 0.01ms.
-- [ ] 6. Text pairings stay inside the guide §3.2 ledger. Do not use `neutral-500`, `red-400`, or `red-500` as text. Every red-enamel control has its gold edge (2px buttons, 1px tags).
-- [ ] 7. 🧪 Contrast test asserts the ledger floors: muted (#b0aa9e) on panel ≥7:1; disabled (#85827c) on panel ≥4.5:1; gold-100 on enamel bottom stop (red-800) ≥4.5:1; ink on ice-300, gold-300, and red-300 fills ≥4.5:1.
-- [ ] 8. 🧪 Banned-pairing test: no computed text color is `neutral-500`, `red-400`, or `red-500`; Russo One rules have `font-weight: 400`.
+- [x] 1. Copy `we-rankin-tokens.css` primitives and semantic tokens into the client (`--bg-*`, `--text-*`, `--border-*`, `--cat-*`, `--chip-*`, `--medal-*`, type, space, radius, `--tap-min` 48 / `--tap-primary` 56, motion). Do not keep Style Guide v0 light surfaces (#ffffff / #14171f) or v0 category gradients (blue, violet→pink, red→yellow).
+- [x] 2. Category accents from tokens (guide §4, D1 = A): Compellingness ice (`--cat-comp-*`), Funniness gold (`--cat-fun-*`), Hotness red (`--cat-hot-*`). Selected score text is `--text-ink`. Enamel button text is flat `--text-gold` (gold-100), not a gold gradient.
+- [x] 3. Type scale from tokens: numeral 40, title 28 (header wordmark 24), card-title 20, body 16, label floor 13. 4px spacing grid; page gutter 16 (12 at ≤380px). Radius 16 on panels. Russo One is weight 400 only (`font-synthesis: none`).
+- [x] 4. Bundle Inter (400/500/600/700) and Russo One (400) locally — `@fontsource/inter` and `@fontsource/russo-one`, or the woff2 files named in the tokens file. No CDN.
+- [x] 5. Base page matches tokens file: canvas background, Inter body, paper-grain noise tiled at 256px, `prefers-reduced-motion` collapsed to 0.01ms.
+- [x] 6. Text pairings stay inside the guide §3.2 ledger. Do not use `neutral-500`, `red-400`, or `red-500` as text. Every red-enamel control has its gold edge (2px buttons, 1px tags).
+- [x] 7. 🧪 Contrast test asserts the ledger floors: muted (#b0aa9e) on panel ≥7:1; disabled (#85827c) on panel ≥4.5:1; gold-100 on enamel bottom stop (red-800) ≥4.5:1; ink on ice-300, gold-300, and red-300 fills ≥4.5:1.
+- [x] 8. 🧪 Banned-pairing test: no computed text color is `neutral-500`, `red-400`, or `red-500`; Russo One rules have `font-weight: 400`.
 
 (no observability required: presentational)
 
@@ -245,12 +245,12 @@ Requires: 3.1 complete
 Produces: routes, layout, safe-area handling
 Authority: guide §5 (App header, Phase rail, Bottom tabs) and the specimen header / phase rail / tab bar. Class reference: `.app-header`, `.conn`, `.phase-rail`, `.tabbar` in `we-rankin-components.css`.
 
-- [ ] 1. Routes: `/` landing, `/s/:code` session, fallback 404 view
-- [ ] 2. Read host secret from URL fragment `#h=`; store in localStorage; replace URL without fragment
-- [ ] 3. Layout: 56px header (red star shape + "WE RANKIN'" Russo 24 gold-100, connection pill), phase rail (Lobby · Pitching · Voting · Closed), content, 56px bottom tabs (Notes · Rank · Players). Active tab and active phase use red-800 plus a 3px gold bar.
-- [ ] 4. `viewport-fit=cover`, safe-area insets on the tab bar, `overscroll-behavior: contain` on app root. Phone width; no 1440px three-column shell.
-- [ ] 5. 🧪 Route tests: fragment parsed, stored, stripped
-- [ ] 6. 🔍 Shell renders at 360, 390, and 430 px with no horizontal scroll (same widths the specimen was audited at)
+- [x] 1. Routes: `/` landing, `/s/:code` session, fallback 404 view
+- [x] 2. Read host secret from URL fragment `#h=`; store in localStorage; replace URL without fragment
+- [x] 3. Layout: 56px header (red star shape + "WE RANKIN'" Russo 24 gold-100, connection pill), phase rail (Lobby · Pitching · Voting · Closed), content, 56px bottom tabs (Notes · Rank · Players). Active tab and active phase use red-800 plus a 3px gold bar.
+- [x] 4. `viewport-fit=cover`, safe-area insets on the tab bar, `overscroll-behavior: contain` on app root. Phone width; no 1440px three-column shell.
+- [x] 5. 🧪 Route tests: fragment parsed, stored, stripped
+- [x] 6. 🔍 Shell renders at 360, 390, and 430 px with no horizontal scroll (same widths the specimen was audited at)
 
 (no observability required: presentational)
 
@@ -258,13 +258,13 @@ Authority: guide §5 (App header, Phase rail, Bottom tabs) and the specimen head
 Requires: 3.2, 2.1 complete
 Produces: `/__fixtures/:scene` dev-only route, scene registry
 
-- [ ] 1. `client/fixtures/*.json` typed as `ClientView`
-- [ ] 2. Route `/__fixtures/:scene` renders a screen from fixture; no network
-- [ ] 3. Freeze clock; disable animations/transitions via flag; seed RNG
-- [ ] 4. Scene registry `client/fixtures/scenes.ts`; each screen section adds its scenes
-- [ ] 5. Exclude route from production build
-- [ ] 6. 🧪 Prod build serves 404 for `/__fixtures/*`
-- [ ] 7. 🧪 Every registry entry resolves to a fixture file
+- [x] 1. `client/fixtures/*.json` typed as `ClientView`
+- [x] 2. Route `/__fixtures/:scene` renders a screen from fixture; no network
+- [x] 3. Freeze clock; disable animations/transitions via flag; seed RNG
+- [x] 4. Scene registry `client/fixtures/scenes.ts`; each screen section adds its scenes
+- [x] 5. Exclude route from production build
+- [x] 6. 🧪 Prod build serves 404 for `/__fixtures/*`
+- [x] 7. 🧪 Every registry entry resolves to a fixture file
 
 (no observability required: dev-only)
 
@@ -272,26 +272,26 @@ Produces: `/__fixtures/:scene` dev-only route, scene registry
 Requires: 3.3 complete
 Produces: `npm run shots` → PNGs + manifest
 
-- [ ] 1. `scripts/shots.ts`: scenes × viewports 390×844 and 360×740, scale 2, touch on
-- [ ] 2. Output `shots/{scene}.{viewport}.png` and `shots/manifest.json`
-- [ ] 3. Assertion: no horizontal overflow (`scrollWidth ≤ clientWidth`)
-- [ ] 4. Assertion: no clipped text (overflow-hidden elements with `scrollWidth > clientWidth`)
-- [ ] 5. Assertion: every button/chip tap target ≥48px
-- [ ] 6. Assertion: 0 console errors
-- [ ] 7. Exit non-zero on any assertion failure; print summary table
-- [ ] 8. run: `npm run shots`
-- [ ] 9. 🧪 Deliberately broken fixture trips each assertion once, then removed
-- [ ] 10. 🔍 Full run ≤60 s
-- [ ] 11. 👁 Manifest records per-scene pass/fail and duration
+- [x] 1. `scripts/shots.ts`: scenes × viewports 390×844 and 360×740, scale 2, touch on
+- [x] 2. Output `shots/{scene}.{viewport}.png` and `shots/manifest.json`
+- [x] 3. Assertion: no horizontal overflow (`scrollWidth ≤ clientWidth`)
+- [x] 4. Assertion: no clipped text (overflow-hidden elements with `scrollWidth > clientWidth`)
+- [x] 5. Assertion: every button/chip tap target ≥48px
+- [x] 6. Assertion: 0 console errors
+- [x] 7. Exit non-zero on any assertion failure; print summary table
+- [x] 8. run: `npm run shots`
+- [x] 9. 🧪 Deliberately broken fixture trips each assertion once, then removed
+- [x] 10. 🔍 Full run ≤60 s
+- [x] 11. 👁 Manifest records per-scene pass/fail and duration
 
 ### 3.5 Agent Loop Doc
 Requires: 3.4 complete
 Produces: `AGENTS.md`, `docs/style-checklist.md`
 
-- [ ] 1. `AGENTS.md`: loop = edit → `npm run shots` → view PNGs against `instructions/we-rankin-style-specimen.html` → check `docs/style-checklist.md` → repeat; stop at 5 passes or all green
-- [ ] 2. `docs/style-checklist.md`: copy the 10 yes/no items from style guide Appendix A (5 scripted, 5 visual). Do not write a second list.
-- [ ] 3. Rule: baselines committed only after host approval; later diffs via `toHaveScreenshot`. Compare UI shots to the specimen, not to Style Guide v0.
-- [ ] 4. 🔍 Dry run on a placeholder scene follows the loop end to end
+- [x] 1. `AGENTS.md`: loop = edit → `npm run shots` → view PNGs against `instructions/we-rankin-style-specimen.html` → check `docs/style-checklist.md` → repeat; stop at 5 passes or all green
+- [x] 2. `docs/style-checklist.md`: copy the 10 yes/no items from style guide Appendix A (5 scripted, 5 visual). Do not write a second list.
+- [x] 3. Rule: baselines committed only after host approval; later diffs via `toHaveScreenshot`. Compare UI shots to the specimen, not to Style Guide v0.
+- [x] 4. 🔍 Dry run on a placeholder scene follows the loop end to end
 
 (no observability required)
 
@@ -307,160 +307,160 @@ Produces: authoritative, tested session state machine behind WebSocket + HTTP
 Requires: 1.2 complete
 Produces: tables, constraints, migration runner
 
-- [ ] 1. Tables: `meta`, `players`, `pitches`, `scores`, `chips`, `ballots`, `results`, `metrics`
-- [ ] 2. `meta`: code, phase, roster_locked, created_at, closed_at, host_secret_hash, schema_version
-- [ ] 3. `players`: id, name (unique, case-insensitive), role, removed, last_seen
-- [ ] 4. `pitches`: id, title, presenter_name, presenter_player_id (nullable), status, position
-- [ ] 5. `scores`: (player_id, pitch_id, category) unique, value with CHECK per category range
-- [ ] 6. `chips`: (player_id, pitch_id, chip_id); `ballots`: player_id, order_json, placed_json, submitted, created_at; `results`: json, computed_at
-- [ ] 7. Migration runner in DO constructor inside `blockConcurrencyWhile`; versioned
-- [ ] 8. 🧪 Constraint tests: duplicate name (case variant), score out of range, duplicate score upserts
-- [ ] 9. 🔍 Dump schema; compare with this list
-- [ ] 10. 👁 log `db.migrated` INFO `{from,to}`
+- [x] 1. Tables: `meta`, `players`, `pitches`, `scores`, `chips`, `ballots`, `results`, `metrics`
+- [x] 2. `meta`: code, phase, roster_locked, created_at, closed_at, host_secret_hash, schema_version
+- [x] 3. `players`: id, name (unique, case-insensitive), role, removed, last_seen
+- [x] 4. `pitches`: id, title, presenter_name, presenter_player_id (nullable), status, position
+- [x] 5. `scores`: (player_id, pitch_id, category) unique, value with CHECK per category range
+- [x] 6. `chips`: (player_id, pitch_id, chip_id); `ballots`: player_id, order_json, placed_json, submitted, created_at; `results`: json, computed_at
+- [x] 7. Migration runner in DO constructor inside `blockConcurrencyWhile`; versioned
+- [x] 8. 🧪 Constraint tests: duplicate name (case variant), score out of range, duplicate score upserts
+- [x] 9. 🔍 Dump schema; compare with this list
+- [x] 10. 👁 log `db.migrated` INFO `{from,to}`
 
 ### 4.2 Session Creation Endpoint
 Requires: 4.1, 1.3 complete; CREATE_KEY in env
 Produces: `POST /api/sessions` → `{code, hostSecret}`
 
-- [ ] 1. Constant-time compare body `createKey` to `env.CREATE_KEY`; 401 on mismatch
-- [ ] 2. Generate 6-char code; DO id = `idFromName(code)`; `init()` fails if already initialized → retry ≤5
-- [ ] 3. Generate 128-bit host secret; store SHA-256 hash only; return plaintext once
-- [ ] 4. 🧪 Wrong key → 401; right key → 200 with code regex match
-- [ ] 5. 🧪 Plaintext secret absent from storage dump
-- [ ] 6. 🧪 Forced collision retries then succeeds
-- [ ] 7. 👁 log `session.created` INFO; metric `sessions_created`
-- [ ] 8. 👁 log `auth.failed` WARN on bad key (no key value logged)
-- [ ] 9. Alert note: >5 `auth.failed`/min → rotate CREATE_KEY manually
+- [x] 1. Constant-time compare body `createKey` to `env.CREATE_KEY`; 401 on mismatch
+- [x] 2. Generate 6-char code; DO id = `idFromName(code)`; `init()` fails if already initialized → retry ≤5
+- [x] 3. Generate 128-bit host secret; store SHA-256 hash only; return plaintext once
+- [x] 4. 🧪 Wrong key → 401; right key → 200 with code regex match
+- [x] 5. 🧪 Plaintext secret absent from storage dump
+- [x] 6. 🧪 Forced collision retries then succeeds
+- [x] 7. 👁 log `session.created` INFO; metric `sessions_created`
+- [x] 8. 👁 log `auth.failed` WARN on bad key (no key value logged)
+- [x] 9. Alert note: >5 `auth.failed`/min → rotate CREATE_KEY manually
 
 ### 4.3 WebSocket Accept & Auth
 Requires: 4.2 complete
 Produces: hibernation-safe sockets with identity attachment
 
-- [ ] 1. `GET /api/s/:code/ws` upgrade → `ctx.acceptWebSocket`
-- [ ] 2. First message `hello{playerId?, hostSecret?}` within 5 s else close 4001
-- [ ] 3. Verify `hostSecret` against stored hash; failure → close 4003
-- [ ] 4. Store `{playerId, isHost}` via `serializeAttachment`; restore after hibernation
-- [ ] 5. Unauthenticated sockets may send only `hello`, `join`, `reclaim`
-- [ ] 6. 🧪 Unauthenticated write rejected; bad secret closes 4003
-- [ ] 7. 🧪 Simulated hibernation wake restores attachment
-- [ ] 8. 👁 log `ws.connected` / `ws.disconnected` / `ws.rejected`; gauge `ws_connections`; metric `reconnects` on hello with known playerId after a disconnect
+- [x] 1. `GET /api/s/:code/ws` upgrade → `ctx.acceptWebSocket`
+- [x] 2. First message `hello{playerId?, hostSecret?}` within 5 s else close 4001
+- [x] 3. Verify `hostSecret` against stored hash; failure → close 4003
+- [x] 4. Store `{playerId, isHost}` via `serializeAttachment`; restore after hibernation
+- [x] 5. Unauthenticated sockets may send only `hello`, `join`, `reclaim`
+- [x] 6. 🧪 Unauthenticated write rejected; bad secret closes 4003
+- [x] 7. 🧪 Simulated hibernation wake restores attachment
+- [x] 8. 👁 log `ws.connected` / `ws.disconnected` / `ws.rejected`; gauge `ws_connections`; metric `reconnects` on hello with known playerId after a disconnect
 
 ### 4.4 Message Protocol & Validation
 Requires: 4.3, 2.1 complete
 Produces: zod schemas, `clientSeq` ack/dedupe
 
-- [ ] 1. Client messages: `hello` `join` `reclaim` `setScore` `setChips` `movePitch{pitchId,toIndex}` `placePitch{pitchId}` `submitBallot` `host.addPitch` `host.updatePitch` `host.removePitch` `host.setStatus` `host.startPitching` `host.openVoting` `host.closeVoting` `host.promote` `host.removePlayer` `host.releaseName`
-- [ ] 2. Server messages: `view`, `ack{clientSeq}`, `error{clientSeq?, code}`, `serverAlert{kind}`
-- [ ] 3. Every write carries `clientSeq`; dedupe by (playerId, clientSeq) over last 200
-- [ ] 4. Max message 8 KB; unknown type → `error bad_message`
-- [ ] 5. 🧪 Schema accept/reject table
-- [ ] 6. 🧪 Replayed `clientSeq` has one effect and re-acks
-- [ ] 7. 👁 log `write.rejected` WARN `{code}`; metrics `writes_ok`, `writes_failed`
+- [x] 1. Client messages: `hello` `join` `reclaim` `setScore` `setChips` `movePitch{pitchId,toIndex}` `placePitch{pitchId}` `submitBallot` `host.addPitch` `host.updatePitch` `host.removePitch` `host.setStatus` `host.startPitching` `host.openVoting` `host.closeVoting` `host.promote` `host.removePlayer` `host.releaseName`
+- [x] 2. Server messages: `view`, `ack{clientSeq}`, `error{clientSeq?, code}`, `serverAlert{kind}`
+- [x] 3. Every write carries `clientSeq`; dedupe by (playerId, clientSeq) over last 200
+- [x] 4. Max message 8 KB; unknown type → `error bad_message`
+- [x] 5. 🧪 Schema accept/reject table
+- [x] 6. 🧪 Replayed `clientSeq` has one effect and re-acks
+- [x] 7. 👁 log `write.rejected` WARN `{code}`; metrics `writes_ok`, `writes_failed`
 
 ### 4.5 View Projection (Privacy)
 Requires: 4.4, 2.5 complete
 Produces: `buildView(playerId)`, coalesced broadcast
 
-- [ ] 1. View contains: phase, roster flag, players `{name, role, connected, submitted}`, pitches, own scores/chips/ballot, `missing[]`, results only when Closed
-- [ ] 2. Host view adds host control flags; never other players' scores or ballots
-- [ ] 3. Spectator view omits notes/ballot
-- [ ] 4. Broadcast after each mutation, coalesced to ≤10/s
-- [ ] 5. 🧪 Property test: no player's view contains another player's scores/ballot across random sessions
-- [ ] 6. 🧪 `results` absent before Closed
-- [ ] 7. 👁 log `view.sent` DEBUG `{bytes}`; assert typical view <20 KB at 25 players × 10 pitches
+- [x] 1. View contains: phase, roster flag, players `{name, role, connected, submitted}`, pitches, own scores/chips/ballot, `missing[]`, results only when Closed
+- [x] 2. Host view adds host control flags; never other players' scores or ballots
+- [x] 3. Spectator view omits notes/ballot
+- [x] 4. Broadcast after each mutation, coalesced to ≤10/s
+- [x] 5. 🧪 Property test: no player's view contains another player's scores/ballot across random sessions
+- [x] 6. 🧪 `results` absent before Closed
+- [x] 7. 👁 log `view.sent` DEBUG `{bytes}`; assert typical view <20 KB at 25 players × 10 pitches
 
 ### 4.6 Join, Reclaim, Roster
 Requires: 4.5 complete
 Produces: identity and roster rules
 
-- [ ] 1. `join{name}`: validate; Lobby → voter; after roster lock → spectator; issue UUID `playerId`
-- [ ] 2. Name unique case-insensitive; collision → `error name_taken`
-- [ ] 3. `reclaim{name}`: any phase; reject `name_in_use` while that player has a live socket
-- [ ] 4. `host.releaseName`: closes that player's socket so reclaim succeeds
-- [ ] 5. `host.promote`: spectator → voter only before Voting
-- [ ] 6. `host.removePlayer`: `removed=true`; data excluded from tally
-- [ ] 7. Host link + `join` creates host as voter by default
-- [ ] 8. 🧪 Matrix: join per phase; reclaim live vs dead; promote after Voting rejected; remove excludes data
-- [ ] 9. 👁 log `player.joined` / `player.reclaimed` / `player.promoted` / `player.removed`; metric `players_joined`
+- [x] 1. `join{name}`: validate; Lobby → voter; after roster lock → spectator; issue UUID `playerId`
+- [x] 2. Name unique case-insensitive; collision → `error name_taken`
+- [x] 3. `reclaim{name}`: any phase; reject `name_in_use` while that player has a live socket
+- [x] 4. `host.releaseName`: closes that player's socket so reclaim succeeds
+- [x] 5. `host.promote`: spectator → voter only before Voting
+- [x] 6. `host.removePlayer`: `removed=true`; data excluded from tally
+- [x] 7. Host link + `join` creates host as voter by default
+- [x] 8. 🧪 Matrix: join per phase; reclaim live vs dead; promote after Voting rejected; remove excludes data
+- [x] 9. 👁 log `player.joined` / `player.reclaimed` / `player.promoted` / `player.removed`; metric `players_joined`
 
 ### 4.7 Phase Machine
 Requires: 4.6 complete
 Produces: Lobby → Pitching → Voting → Closed
 
-- [ ] 1. Host-only transitions; invalid → `error bad_transition`; repeats idempotent
-- [ ] 2. `startPitching`: set `roster_locked`
-- [ ] 3. `openVoting`: create ballot per voter (order = lineup minus own pitch); scoring unlocked for all pitches
-- [ ] 4. `closeVoting`: run tally (4.11), set `closed_at`, set retention alarm (4.12)
-- [ ] 5. Closed rejects every write except `host.updatePitch` title/presenter name
-- [ ] 6. 🧪 Transition table incl. reverse transitions rejected
-- [ ] 7. 🧪 Ballots created exactly once per voter
-- [ ] 8. 👁 log `phase.changed` INFO `{from,to}`; `roster.locked` INFO `{voters}`; `voting.closed` INFO `{counted,voided}`
+- [x] 1. Host-only transitions; invalid → `error bad_transition`; repeats idempotent
+- [x] 2. `startPitching`: set `roster_locked`
+- [x] 3. `openVoting`: create ballot per voter (order = lineup minus own pitch); scoring unlocked for all pitches
+- [x] 4. `closeVoting`: run tally (4.11), set `closed_at`, set retention alarm (4.12)
+- [x] 5. Closed rejects every write except `host.updatePitch` title/presenter name
+- [x] 6. 🧪 Transition table incl. reverse transitions rejected
+- [x] 7. 🧪 Ballots created exactly once per voter
+- [x] 8. 👁 log `phase.changed` INFO `{from,to}`; `roster.locked` INFO `{voters}`; `voting.closed` INFO `{counted,voided}`
 
 ### 4.8 Pitch Management
 Requires: 4.7 complete
 Produces: pitch CRUD, status, mid-session add rules
 
-- [ ] 1. `host.addPitch`: title 1–80; presenter name 1–24; explicit `presenterPlayerId` or `none`; allowed Lobby/Pitching/Voting
-- [ ] 2. `position` = insertion order; status defaults `upcoming`
-- [ ] 3. `host.setStatus` presenting → previous presenting becomes `done`
-- [ ] 4. `host.updatePitch`: title/presenter name editable any phase; presenter link immutable once Voting opens
-- [ ] 5. `host.removePitch`: purge its scores, chips, ballot entries
-- [ ] 6. Add during Voting: append unplaced to every eligible ballot; set all voters `submitted=false`
-- [ ] 7. 🧪 Add during Voting resets submitted flags and excludes presenter's ballot
-- [ ] 8. 🧪 Presenter link change after Voting rejected
-- [ ] 9. 🧪 Removal purges all dependent rows
-- [ ] 10. 👁 log `pitch.added` / `pitch.updated` / `pitch.removed` / `pitch.status`
+- [x] 1. `host.addPitch`: title 1–80; presenter name 1–24; explicit `presenterPlayerId` or `none`; allowed Lobby/Pitching/Voting
+- [x] 2. `position` = insertion order; status defaults `upcoming`
+- [x] 3. `host.setStatus` presenting → previous presenting becomes `done`
+- [x] 4. `host.updatePitch`: title/presenter name editable any phase; presenter link immutable once Voting opens
+- [x] 5. `host.removePitch`: purge its scores, chips, ballot entries
+- [x] 6. Add during Voting: append unplaced to every eligible ballot; set all voters `submitted=false`
+- [x] 7. 🧪 Add during Voting resets submitted flags and excludes presenter's ballot
+- [x] 8. 🧪 Presenter link change after Voting rejected
+- [x] 9. 🧪 Removal purges all dependent rows
+- [x] 10. 👁 log `pitch.added` / `pitch.updated` / `pitch.removed` / `pitch.status`
 
 ### 4.9 Notes Writes
 Requires: 4.8 complete
 Produces: `setScore`, `setChips`
 
-- [ ] 1. `setScore{pitchId, category, value}`: voter only; not own pitch; pitch `presenting`/`done` or phase Voting; integer within category range; upsert
-- [ ] 2. `setChips{pitchId, chipIds}`: ids valid; replaces set; same permission rules
-- [ ] 3. Reject all in Lobby and Closed
-- [ ] 4. 🧪 Reject: spectator, own pitch, upcoming pitch before Voting, out-of-range, Closed, removed player
-- [ ] 5. 🧪 Last-write-wins on rapid duplicate taps
-- [ ] 6. 👁 log `score.saved` DEBUG; metric `writes_ok`
+- [x] 1. `setScore{pitchId, category, value}`: voter only; not own pitch; pitch `presenting`/`done` or phase Voting; integer within category range; upsert
+- [x] 2. `setChips{pitchId, chipIds}`: ids valid; replaces set; same permission rules
+- [x] 3. Reject all in Lobby and Closed
+- [x] 4. 🧪 Reject: spectator, own pitch, upcoming pitch before Voting, out-of-range, Closed, removed player
+- [x] 5. 🧪 Last-write-wins on rapid duplicate taps
+- [x] 6. 👁 log `score.saved` DEBUG; metric `writes_ok`
 
 ### 4.10 Ballot Writes
 Requires: 4.9 complete
 Produces: `movePitch`, `placePitch`, `submitBallot`
 
-- [ ] 1. `movePitch`: phase Voting; voter with ballot; applies `applyMove`; marks placed
-- [ ] 2. `placePitch`: marks placed; order unchanged
-- [ ] 3. `submitBallot`: `ballotComplete` else `error incomplete{missing[]}`
-- [ ] 4. Edits after submit keep `submitted=true` (resets only via 4.8)
-- [ ] 5. 🧪 Move/place idempotent on replay
-- [ ] 6. 🧪 Submit blocked: missing score, unplaced NEW; allowed when complete
-- [ ] 7. 🧪 Edit after submit keeps submitted
-- [ ] 8. 👁 log `ballot.reordered` DEBUG, `ballot.submitted` INFO; metric `ballots_submitted`
+- [x] 1. `movePitch`: phase Voting; voter with ballot; applies `applyMove`; marks placed
+- [x] 2. `placePitch`: marks placed; order unchanged
+- [x] 3. `submitBallot`: `ballotComplete` else `error incomplete{missing[]}`
+- [x] 4. Edits after submit keep `submitted=true` (resets only via 4.8)
+- [x] 5. 🧪 Move/place idempotent on replay
+- [x] 6. 🧪 Submit blocked: missing score, unplaced NEW; allowed when complete
+- [x] 7. 🧪 Edit after submit keeps submitted
+- [x] 8. 👁 log `ballot.reordered` DEBUG, `ballot.submitted` INFO; metric `ballots_submitted`
 
 ### 4.11 Tally on Close
 Requires: 4.10, 2.5 complete
 Produces: persisted `results` row broadcast to all
 
-- [ ] 1. `closeVoting` builds snapshot, calls `computeResults`, persists JSON
-- [ ] 2. Voided/removed players' data retained in storage, excluded from results
-- [ ] 3. Broadcast `view` with `results`
-- [ ] 4. 🧪 Scripted 6-voter session through WebSocket test client equals shared fixture
-- [ ] 5. 🧪 Tally exception → phase stays Voting, error returned, A2 raised
-- [ ] 6. 👁 log `tally.computed` INFO `{counted, voided, ms}`; metric `tallies_run`
-- [ ] 7. 👁 Alert A2 banner appears on host client when tally throws (forced test)
+- [x] 1. `closeVoting` builds snapshot, calls `computeResults`, persists JSON
+- [x] 2. Voided/removed players' data retained in storage, excluded from results
+- [x] 3. Broadcast `view` with `results`
+- [x] 4. 🧪 Scripted 6-voter session through WebSocket test client equals shared fixture
+- [x] 5. 🧪 Tally exception → phase stays Voting, error returned, A2 raised
+- [x] 6. 👁 log `tally.computed` INFO `{counted, voided, ms}`; metric `tallies_run`
+- [x] 7. 👁 Alert A2 banner appears on host client when tally throws (forced test)
 
 ### 4.12 Limits, Export, Retention
 Requires: 4.11 complete
 Produces: rate limiting, raw export, expiry
 
-- [ ] 1. Token bucket 20 msg/s per socket; 3 strikes → close 4008
-- [ ] 2. `GET /api/s/:code/export` with host secret header: raw JSON of all tables, any phase
-- [ ] 3. Raw JSON restorable shape documented in `docs/export-format.md`
-- [ ] 4. Alarm at `closed_at + 30 d` deletes all storage
-- [ ] 5. Wrap all storage writes: exception → `write.failed` ERROR, metric `writes_failed`, A1 to host
-- [ ] 6. 🧪 Rate limit trips and closes socket
-- [ ] 7. 🧪 Export rejects missing/wrong secret
-- [ ] 8. 🧪 Alarm handler deletes data (fake timers)
-- [ ] 9. 🧪 Forced storage error raises A1
-- [ ] 10. 👁 log `rate.limited` WARN, `export.raw` INFO, `session.expired` INFO; metric `rate_limited`
+- [x] 1. Token bucket 20 msg/s per socket; 3 strikes → close 4008
+- [x] 2. `GET /api/s/:code/export` with host secret header: raw JSON of all tables, any phase
+- [x] 3. Raw JSON restorable shape documented in `docs/export-format.md`
+- [x] 4. Alarm at `closed_at + 30 d` deletes all storage
+- [x] 5. Wrap all storage writes: exception → `write.failed` ERROR, metric `writes_failed`, A1 to host
+- [x] 6. 🧪 Rate limit trips and closes socket
+- [x] 7. 🧪 Export rejects missing/wrong secret
+- [x] 8. 🧪 Alarm handler deletes data (fake timers)
+- [x] 9. 🧪 Forced storage error raises A1
+- [x] 10. 👁 log `rate.limited` WARN, `export.raw` INFO, `session.expired` INFO; metric `rate_limited`
 
 Go when: all backend tests green; scripted full session passes over WebSocket; privacy property test green; forced-failure alerts verified
 
@@ -474,22 +474,22 @@ Produces: resilient connection, store, write queue, saved indicator, alert banne
 Requires: 4.3 complete
 Produces: reconnecting WebSocket client
 
-- [ ] 1. Connect to `/api/s/:code/ws`; send `hello` with stored `playerId` / host secret
-- [ ] 2. Reconnect with backoff 0.5 → 8 s plus jitter
-- [ ] 3. On `visibilitychange` → visible: reconnect immediately if not open
-- [ ] 4. On open: server pushes full `view`; replace store
-- [ ] 5. Status states: `connecting` · `online` · `offline`; shown in header
-- [ ] 6. `window.onerror` / unhandledrejection → send `client.error{message, stack≤1KB}` when online
-- [ ] 7. 🧪 Mock-socket tests: backoff schedule, visibility reconnect
-- [ ] 8. 👁 Server logs `client.error` WARN with `playerId`; client `console.info` state transitions
+- [x] 1. Connect to `/api/s/:code/ws`; send `hello` with stored `playerId` / host secret
+- [x] 2. Reconnect with backoff 0.5 → 8 s plus jitter
+- [x] 3. On `visibilitychange` → visible: reconnect immediately if not open
+- [x] 4. On open: server pushes full `view`; replace store
+- [x] 5. Status states: `connecting` · `online` · `offline`; shown in header
+- [x] 6. `window.onerror` / unhandledrejection → send `client.error{message, stack≤1KB}` when online
+- [x] 7. 🧪 Mock-socket tests: backoff schedule, visibility reconnect
+- [x] 8. 👁 Server logs `client.error` WARN with `playerId`; client `console.info` state transitions
 
 ### 5.2 Store & Selectors
 Requires: 5.1, 2.4 complete
 Produces: view store, selectors
 
-- [ ] 1. Store holds latest `view`, connection status, pending writes
-- [ ] 2. Selectors: `me`, `eligiblePitches`, `missingItems`, `waitingOn`, `isSpectator`
-- [ ] 3. 🧪 Selectors against fixtures
+- [x] 1. Store holds latest `view`, connection status, pending writes
+- [x] 2. Selectors: `me`, `eligiblePitches`, `missingItems`, `waitingOn`, `isSpectator`
+- [x] 3. 🧪 Selectors against fixtures
 
 (no observability required: derived state)
 
@@ -497,22 +497,22 @@ Produces: view store, selectors
 Requires: 5.2 complete
 Produces: optimistic writes, ordered retry, saved indicator
 
-- [ ] 1. Assign `clientSeq`; apply optimistic update using shared pure functions
-- [ ] 2. Mark pending until `ack`; resend pending in order after reconnect
-- [ ] 3. On `error` for a seq: revert optimistic change; show toast
-- [ ] 4. Indicator states in the header connection pill (specimen `.conn`): `Saved ✓` · `Saving…` · `Offline — N pending` (guide wording "Reconnecting…" maps to the offline/connecting states here)
-- [ ] 5. 🧪 Drop socket mid-write → reconnect → one applied effect; order preserved
-- [ ] 6. 🔍 Playwright offline→online toggle keeps all taps
-- [ ] 7. 👁 `console.debug` queue depth on reconnect
-- [ ] 8. Scenes: `saving`, `offline-pending`
+- [x] 1. Assign `clientSeq`; apply optimistic update using shared pure functions
+- [x] 2. Mark pending until `ack`; resend pending in order after reconnect
+- [x] 3. On `error` for a seq: revert optimistic change; show toast
+- [x] 4. Indicator states in the header connection pill (specimen `.conn`): `Saved ✓` · `Saving…` · `Offline — N pending` (guide wording "Reconnecting…" maps to the offline/connecting states here)
+- [x] 5. 🧪 Drop socket mid-write → reconnect → one applied effect; order preserved
+- [x] 6. 🔍 Playwright offline→online toggle keeps all taps
+- [x] 7. 👁 `console.debug` queue depth on reconnect
+- [x] 8. Scenes: `saving`, `offline-pending`
 
 ### 5.4 Alert Banner
 Requires: 5.1 complete
 Produces: host `serverAlert` banner
 
-- [ ] 1. Render A1/A2 banner on host with "Download raw JSON" button
-- [ ] 2. Scenes: `banner-a1`, `banner-a2`
-- [ ] 3. 🧪 Component test: banner shows on `serverAlert`, hidden for players
+- [x] 1. Render A1/A2 banner on host with "Download raw JSON" button
+- [x] 2. Scenes: `banner-a1`, `banner-a2`
+- [x] 3. 🧪 Component test: banner shows on `serverAlert`, hidden for players
 
 (no observability required: presentational)
 
@@ -529,13 +529,13 @@ Authority: guide §6 (`join`, `lobby-*`) and specimen sections Join and Players.
 Requires: 3.2, 4.2 complete
 Produces: create-session flow
 
-- [ ] 1. Form: CREATE_KEY input + "Create session"
-- [ ] 2. Success: show player link + host link; Copy buttons; notice "Save the host link"
-- [ ] 3. Store host link in localStorage; navigate to session
-- [ ] 4. Scenes: `landing`, `created`, `create-key-error`
-- [ ] 5. 🧪 401 shows inline error
-- [ ] 6. 🔍 `npm run shots` green for new scenes
-- [ ] 7. 🔍 Copy buttons yield exact links (clipboard test)
+- [x] 1. Form: CREATE_KEY input + "Create session"
+- [x] 2. Success: show player link + host link; Copy buttons; notice "Save the host link"
+- [x] 3. Store host link in localStorage; navigate to session
+- [x] 4. Scenes: `landing`, `created`, `create-key-error`
+- [x] 5. 🧪 401 shows inline error
+- [x] 6. 🔍 `npm run shots` green for new scenes
+- [x] 7. 🔍 Copy buttons yield exact links (clipboard test)
 
 (no observability required: server logs cover create/auth)
 
@@ -543,13 +543,13 @@ Produces: create-session flow
 Requires: 6.1, 5.3, 4.6 complete
 Produces: name-only join
 
-- [ ] 1. Name field autofocus; limit 24; Enter submits
-- [ ] 2. `name_taken` → "That's me (reclaim)" or pick another name
-- [ ] 3. `name_in_use` → message "That name is active on another device"
-- [ ] 4. Persist `playerId` in cookie + localStorage; reload restores identity
-- [ ] 5. Scenes: `join`, `join-name-taken`, `join-name-in-use`
-- [ ] 6. 🧪 Reload restores identity; cleared storage lands on name picker
-- [ ] 7. 🔍 Shots green
+- [x] 1. Name field autofocus; limit 24; Enter submits
+- [x] 2. `name_taken` → "That's me (reclaim)" or pick another name
+- [x] 3. `name_in_use` → message "That name is active on another device"
+- [x] 4. Persist `playerId` in cookie + localStorage; reload restores identity
+- [x] 5. Scenes: `join`, `join-name-taken`, `join-name-in-use`
+- [x] 6. 🧪 Reload restores identity; cleared storage lands on name picker
+- [x] 7. 🔍 Shots green
 
 (no observability required: server logs cover join/reclaim)
 
@@ -557,14 +557,14 @@ Produces: name-only join
 Requires: 6.2 complete
 Produces: roster list, spectator state, host roster actions
 
-- [ ] 1. Players list with badges Host / Voter / Spectator and connected dot
-- [ ] 2. Read-only lineup list
-- [ ] 3. Spectator banner: "You joined after roster lock — view only"
-- [ ] 4. Host actions: promote, remove, release name (confirm dialogs)
-- [ ] 5. Scenes: `lobby-player`, `lobby-host`, `spectator`
-- [ ] 6. 🧪 Host buttons absent for players
-- [ ] 7. 🔍 Two browser contexts see each other's join within 2 s
-- [ ] 8. 🔍 Shots green
+- [x] 1. Players list with badges Host / Voter / Spectator and connected dot
+- [x] 2. Read-only lineup list
+- [x] 3. Spectator banner: "You joined after roster lock — view only"
+- [x] 4. Host actions: promote, remove, release name (confirm dialogs)
+- [x] 5. Scenes: `lobby-player`, `lobby-host`, `spectator`
+- [x] 6. 🧪 Host buttons absent for players
+- [x] 7. 🔍 Two browser contexts see each other's join within 2 s
+- [x] 8. 🔍 Shots green
 
 (no observability required: presentational)
 
@@ -862,3 +862,8 @@ Go when: rehearsal clean, kit printed, T-60 checklist passes
 - 2026-11-16: Foundation started. Local toolchain (Node 22, npm 10, Wrangler 4.72), workspaces, Vite client, Session DO skeleton, `.dev.vars` / `.env.example`, `wrangler.jsonc`, `vercel.json`. Health and SPA fallback checked on `wrangler dev`. Vercel remote env and Cloudflare login still host tasks. Playwright and the Durable Object vitest stub are not done yet.
 - 2026-11-16: Checklist v0.2. App UI sections now follow Style Guide v1 (`we-rankin-style-guide.md`), `we-rankin-tokens.css`, `we-rankin-components.css`, and `we-rankin-style-specimen.html`. Section 3.1 no longer specifies the v0 light palette. Chart-card exports (11.2) stay Hot Takes (guide D2). Backend, domain, and protocol items are unchanged.
 - 2026-11-16: Cloudflare account Alluminate is authenticated via `.env` (`whoami` ok). Git remote is `official-mitchell/rankin`. Logger, metrics, alerts, and the Durable Object vitest stub are in. `wrangler deploy` is live at `https://we-rankin.opatowsky77.workers.dev` (version `79cf9ce7-fe2d-4d51-821f-1ac0fc966fce`). `/api/health` returned 200 from this machine. `CREATE_KEY` secret is set. `main` is pushed (`9f3a453`). `wrangler tail` produced no lines in this session. Phone checks, dashboard logs, Git-build confirmation, and the rollback rehearsal are still open.
+- 2026-11-16: Checklist 2.1–2.5. Shared domain lives in `shared/src`: types, config, stats, Borda, ballot rules, `computeResults`. Fixtures in `shared/src/domain.test.ts` (11 tests) plus the existing app-name test. Message payloads are still discriminants only until 4.4. Disagreement direction is `crowd` when the Borda rank is better and `scores` when the score rank is better.
+- 2026-11-16: Checklist 3.1–3.5. Client tokens and shell, local Inter and Russo One, `/` and `/s/:code`, dev-only `/__fixtures/:scene` (`shell` placeholder). `npm run shots` writes `shots/*.png` and `shots/manifest.json` (gitignored until host approves baselines). Worker returns 404 for `/__fixtures` via `run_worker_first`. Style loop is `AGENTS.md` and `docs/style-checklist.md` (Appendix A copied as written: items 1–6 scripted, 7–10 visual). Shot script assertions cover overflow, clipped text, 48px targets, and console errors. Appendix items 3–6 are on the checklist for visual/later screens; they are not all enforced in `shots.ts` yet.
+- 2026-11-16: Checklist 4.1–4.12. Session Durable Object now owns the SQLite schema, host-secret session create, hibernating WebSocket auth, zod commands, private views, roster and phase rules, pitches, notes, ballots, tally, rate limit, raw export, and the 30-day alarm. Worker tests cover the scripted six-voter tally, privacy, and forced A1/A2 failures.
+- 2026-11-16: Checklist 5.1–5.4. The session page reconnects with backoff, replaces the store from each view, queues writes until ack, and shows the Saved / Saving / Offline pill. Host sockets render the A1/A2 banner with raw JSON download. `client.error` is logged at warn with the player id.
+- 2026-11-16: Checklist 6.1–6.3. Landing creates a session and shows copyable player and host links. Join stores the player id in localStorage and a cookie. The roster shows Host, Voter, and Spectator, a read-only lineup, the spectator notice, and host confirmations for promote, remove, and release. Two browser tabs saw both joins.

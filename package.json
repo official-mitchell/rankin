@@ -1,12 +1,13 @@
 {
   "name": "we-rankin",
   "private": true,
+  "type": "module",
   "workspaces": ["client", "worker", "shared"],
   "scripts": {
     "dev": "wrangler dev",
     "build": "npm run build -w client",
     "test": "vitest run",
-    "shots": "echo 'screenshot loop lands in checklist 3.3' && exit 0",
+    "shots": "node --experimental-strip-types scripts/shots.ts",
     "e2e": "echo 'playwright suite lands in checklist 8' && exit 0",
     "sim": "echo 'load sim lands in checklist 8' && exit 0"
   },
@@ -15,6 +16,7 @@
     "@cloudflare/workers-types": "4.20260310.1",
     "typescript": "^5.9.3",
     "vitest": "3.2.4",
-    "wrangler": "4.72.0"
+    "wrangler": "4.72.0",
+    "playwright": "1.56.1"
   }
 }

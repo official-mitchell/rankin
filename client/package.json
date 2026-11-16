@@ -10,7 +10,9 @@
   "dependencies": {
     "@we-rankin/shared": "*",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/russo-one": "^5.2.7"
   },
   "devDependencies": {
     "@types/react": "^19.2.2",

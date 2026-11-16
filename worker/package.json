@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@we-rankin/shared": "*"
+    "@we-rankin/shared": "*",
+    "zod": "^3.25.76"
   }
 }

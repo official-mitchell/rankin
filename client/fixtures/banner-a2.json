@@ -1,0 +1,7 @@
+{
+  "phase": "voting",
+  "rosterLocked": true,
+  "self": { "playerId": "host", "role": "voter", "isHost": true },
+  "players": [{ "id": "host", "name": "Ada", "role": "voter", "connected": true, "submitted": false }],
+  "pitches": []
+}

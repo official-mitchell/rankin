@@ -58,7 +58,9 @@ async function route(request: Request, env: Env, reqId: string): Promise<Respons
     const headers = new Headers();
     const secret = request.headers.get("x-host-secret");
     if (secret) headers.set("x-host-secret", secret);
-    return stub.fetch("http://session/export", { headers });
+    const target = new URL("http://session/export");
+    target.search = url.search;
+    return stub.fetch(target, { headers });
   }
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/__fixtures")) {
     return Response.json({ error: "not_found" }, { status: 404 });

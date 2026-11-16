@@ -1,4 +1,4 @@
-// Shared package entry. Re-exports domain types, config, stats, Borda, ballots, and results (checklist 2.1–2.5).
+// Shared package entry. Re-exports domain types, config, stats, Borda, ballots, results, and exports (checklist 2 and 11).
 export const APP_NAME = "We Rankin'";
 
 export { EVENTS, type EventName } from "./events";
@@ -56,3 +56,5 @@ export {
   type BallotDraft,
 } from "./ballot";
 export { computeResults } from "./results";
+export { ballotCsv, markdownSummary, summaryCsv, voterIndexes, type ExportBundle, type ExportChip, type ExportPitch, type ExportPlayer } from "./table-export";
+export { chartFontFace, chartPitches, leaderboardSvg, pitchCardSvg, pngFileName, wrapTitle, type ChartPitch, type ChartVotes } from "./charts";

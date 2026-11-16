@@ -281,7 +281,7 @@ Produces: `npm run shots` → PNGs + manifest
 - [x] 7. Exit non-zero on any assertion failure; print summary table
 - [x] 8. run: `npm run shots`
 - [x] 9. 🧪 Deliberately broken fixture trips each assertion once, then removed
-- [x] 10. 🔍 Full run ≤60 s
+- [ ] 10. 🔍 Full run ≤60 s
 - [x] 11. 👁 Manifest records per-scene pass/fail and duration
 
 ### 3.5 Agent Loop Doc
@@ -581,13 +581,13 @@ Authority: guide §6 `host-controls` and specimen "Close confirm" / "Submit · b
 Requires: 6.3, 4.8 complete
 Produces: add/rename/remove/status UI
 
-- [ ] 1. Add form: title, presenter dropdown (players + "Not a player"), presenter name
-- [ ] 2. List with status chip; "Now presenting" button; rename; remove (confirm)
-- [ ] 3. Presenter link control disabled once Voting opens
-- [ ] 4. Scenes: `host-pitches`, `host-pitch-form`
-- [ ] 5. 🧪 Form validation (empty title, >80 chars)
-- [ ] 6. 🔍 Added pitch appears on a second client within 2 s
-- [ ] 7. 🔍 Shots green
+- [x] 1. Add form: title, presenter dropdown (players + "Not a player"), presenter name
+- [x] 2. List with status chip; "Now presenting" button; rename; remove (confirm)
+- [x] 3. Presenter link control disabled once Voting opens
+- [x] 4. Scenes: `host-pitches`, `host-pitch-form`
+- [x] 5. 🧪 Form validation (empty title, >80 chars)
+- [x] 6. 🔍 Added pitch appears on a second client within 2 s
+- [x] 7. 🔍 Shots green
 
 (no observability required: server logs cover pitch events)
 
@@ -595,12 +595,12 @@ Produces: add/rename/remove/status UI
 Requires: 7.1, 4.7 complete
 Produces: confirmed transitions
 
-- [ ] 1. Sticky bar: current phase + next action button
-- [ ] 2. Confirm dialog per transition with effect text: "Locks roster: N voters" / "Creates N ballots" / "Voids: names"
-- [ ] 3. Close dialog lists unsubmitted players
-- [ ] 4. Scenes: `host-controls`, `host-close-confirm`
-- [ ] 5. 🧪 No transition fires without confirm
-- [ ] 6. 🔍 Shots green
+- [x] 1. Sticky bar: current phase + next action button
+- [x] 2. Confirm dialog per transition with effect text: "Locks roster: N voters" / "Creates N ballots" / "Voids: names"
+- [x] 3. Close dialog lists unsubmitted players
+- [x] 4. Scenes: `host-controls`, `host-close-confirm`
+- [x] 5. 🧪 No transition fires without confirm
+- [x] 6. 🔍 Shots green
 
 (no observability required: server logs `phase.changed`)
 
@@ -608,13 +608,13 @@ Produces: confirmed transitions
 Requires: 7.2, 4.12, 5.4 complete
 Produces: waiting list, debug counters, raw JSON download
 
-- [ ] 1. Waiting list panel + "All ballots in" state
-- [ ] 2. Debug toggle shows `writes_failed`, `reconnects`, connected count from view
-- [ ] 3. "Download raw JSON" button available in every phase
-- [ ] 4. Scenes: `host-waiting`, `host-debug`
-- [ ] 5. 🧪 Download returns valid JSON matching `docs/export-format.md`
-- [ ] 6. 👁 Server logs `export.raw` on click
-- [ ] 7. 🔍 Shots green
+- [x] 1. Waiting list panel + "All ballots in" state
+- [x] 2. Debug toggle shows `writes_failed`, `reconnects`, connected count from view
+- [x] 3. "Download raw JSON" button available in every phase
+- [x] 4. Scenes: `host-waiting`, `host-debug`
+- [x] 5. 🧪 Download returns valid JSON matching `docs/export-format.md`
+- [x] 6. 👁 Server logs `export.raw` on click
+- [x] 7. 🔍 Shots green
 
 Go when: Playwright e2e drives host + 2 players Lobby → Closed through the UI
 
@@ -628,15 +628,15 @@ Produces: live note-taking UI with autosave
 Requires: 5.3, 3.1 complete
 Produces: three score inputs per pitch
 
-- [ ] 1. Score pads per guide §5 and specimen "Notes · now presenting" (`.cat`, `.pad`, `.score`): Compellingness 1–5 ice band, Funniness 1–5 gold band, Hotness 1–10 red band in two rows of 5. Unselected: dark inset, gold-500 edge, Russo numeral. Selected: category fill, ink numeral, gold-200 edge.
-- [ ] 2. No default selection
-- [ ] 3. Own pitch → locked card "Your pitch — no scoring" (specimen locked panel: dashed border, no glow)
-- [ ] 4. Upcoming pitches → "Coming up" section, same locked treatment, disabled until presenting/done or Voting
-- [ ] 5. Each tap sends `setScore` via queue; show Saved indicator
-- [ ] 6. Scenes: `notes-empty`, `notes-filled`, `notes-upcoming-locked`, `notes-own-pitch`
-- [ ] 7. 🧪 Tap sends one `setScore` with incrementing `clientSeq`
-- [ ] 8. 🔍 Playwright: every score button ≥48px, no overlap at 360 px
-- [ ] 9. 🔍 Shots green
+- [x] 1. Score pads per guide §5 and specimen "Notes · now presenting" (`.cat`, `.pad`, `.score`): Compellingness 1–5 ice band, Funniness 1–5 gold band, Hotness 1–10 red band in two rows of 5. Unselected: dark inset, gold-500 edge, Russo numeral. Selected: category fill, ink numeral, gold-200 edge.
+- [x] 2. No default selection
+- [x] 3. Own pitch → locked card "Your pitch — no scoring" (specimen locked panel: dashed border, no glow)
+- [x] 4. Upcoming pitches → "Coming up" section, same locked treatment, disabled until presenting/done or Voting
+- [x] 5. Each tap sends `setScore` via queue; show Saved indicator
+- [x] 6. Scenes: `notes-empty`, `notes-filled`, `notes-upcoming-locked`, `notes-own-pitch`
+- [x] 7. 🧪 Tap sends one `setScore` with incrementing `clientSeq`
+- [x] 8. 🔍 Playwright: every score button ≥48px, no overlap at 360 px
+- [x] 9. 🔍 Shots green
 
 (no observability required: presentational; server logs `score.saved`)
 
@@ -644,12 +644,12 @@ Produces: three score inputs per pitch
 Requires: 8.1 complete
 Produces: two chip groups
 
-- [ ] 1. Groups "Investable because…" and "Cautious because…"; multi-select toggles; wrap layout. Match specimen chips (`.chip--invest`, `.chip--caution`): 48px pills, Inter 14.
-- [ ] 2. Investable = green-300 outline → filled green-300 + ink + check. Cautious = neutral-300 outline → filled neutral-300 + ink + check. No category band fills on chips (guide §4).
-- [ ] 3. Each toggle sends `setChips` with full set
-- [ ] 4. Scenes: `notes-chips`
-- [ ] 5. 🧪 Toggle on/off round trip
-- [ ] 6. 🔍 Shots green
+- [x] 1. Groups "Investable because…" and "Cautious because…"; multi-select toggles; wrap layout. Match specimen chips (`.chip--invest`, `.chip--caution`): 48px pills, Inter 14.
+- [x] 2. Investable = green-300 outline → filled green-300 + ink + check. Cautious = neutral-300 outline → filled neutral-300 + ink + check. No category band fills on chips (guide §4).
+- [x] 3. Each toggle sends `setChips` with full set
+- [x] 4. Scenes: `notes-chips`
+- [x] 5. 🧪 Toggle on/off round trip
+- [x] 6. 🔍 Shots green
 
 (no observability required: presentational)
 
@@ -657,11 +657,11 @@ Produces: two chip groups
 Requires: 8.2 complete
 Produces: presenting-pitch focus, progress counter
 
-- [ ] 1. Presenting pitch pinned at top; scroll into view only when status changes
-- [ ] 2. Progress "N/M scored" counting complete pitches
-- [ ] 3. Scenes: `notes-presenting`
-- [ ] 4. 🧪 Host marks next pitch → focus moves on a second client
-- [ ] 5. 🔍 Shots green
+- [x] 1. Presenting pitch pinned at top; scroll into view only when status changes
+- [x] 2. Progress "N/M scored" counting complete pitches
+- [x] 3. Scenes: `notes-presenting`
+- [x] 4. 🧪 Host marks next pitch → focus moves on a second client
+- [x] 5. 🔍 Shots green
 
 (no observability required: presentational)
 
@@ -677,15 +677,15 @@ Produces: drag/button ranking, NEW handling, submit gating, waiting banner
 Requires: 8.1, 4.10 complete
 Produces: reorderable list
 
-- [ ] 1. dnd-kit Sortable; handle-only drag; TouchSensor delay 150 ms / tolerance 5; Pointer and Keyboard sensors. Card geometry from guide §5 Rank card and specimen "Rank" (`.rank`): 40px handle, 44px position disc, body, 48px ▲▼ stack, min-height 100px.
-- [ ] 2. Handle `touch-action: none`; list scrolls normally elsewhere
-- [ ] 3. Up/down buttons (48px, clip-path triangles, gold-100) per card send `movePitch`. Disabled ends use `neutral-500` as non-text only.
-- [ ] 4. Card: rank numeral (Russo, gold), title (Inter 16, wraps, no ellipsis), presenter, my 3 scores as Russo numerals with ice/gold/red dots, my chips
-- [ ] 5. Send `movePitch` on drop only
-- [ ] 6. Scenes: `ranking-default`, `ranking-reordered`
-- [ ] 7. 🧪 Reorder uses shared `applyMove` (optimistic = server result)
-- [ ] 8. 🔍 Playwright mouse drag and button moves both reorder
-- [ ] 9. 🔍 Shots green
+- [x] 1. dnd-kit Sortable; handle-only drag; TouchSensor delay 150 ms / tolerance 5; Pointer and Keyboard sensors. Card geometry from guide §5 Rank card and specimen "Rank" (`.rank`): 40px handle, 44px position disc, body, 48px ▲▼ stack, min-height 100px.
+- [x] 2. Handle `touch-action: none`; list scrolls normally elsewhere
+- [x] 3. Up/down buttons (48px, clip-path triangles, gold-100) per card send `movePitch`. Disabled ends use `neutral-500` as non-text only.
+- [x] 4. Card: rank numeral (Russo, gold), title (Inter 16, wraps, no ellipsis), presenter, my 3 scores as Russo numerals with ice/gold/red dots, my chips
+- [x] 5. Send `movePitch` on drop only
+- [x] 6. Scenes: `ranking-default`, `ranking-reordered`
+- [x] 7. 🧪 Reorder uses shared `applyMove` (optimistic = server result)
+- [x] 8. 🔍 Playwright mouse drag and button moves both reorder
+- [x] 9. 🔍 Shots green
 
 (no observability required: presentational; server logs `ballot.reordered`)
 
@@ -693,11 +693,11 @@ Produces: reorderable list
 Requires: 9.1 complete
 Produces: NEW badge flow
 
-- [ ] 1. NEW badge + "Place here" gold action on unplaced pitches (specimen `.rank--new`, `.badge-new`): dashed red-300 card border, red-enamel "NEW" tag with 1px gold edge
-- [ ] 2. Moving a NEW card clears badge
-- [ ] 3. Scenes: `ranking-new-badge`
-- [ ] 4. 🧪 Host adds pitch in Voting → badge appears on voter within 2 s
-- [ ] 5. 🔍 Shots green
+- [x] 1. NEW badge + "Place here" gold action on unplaced pitches (specimen `.rank--new`, `.badge-new`): dashed red-300 card border, red-enamel "NEW" tag with 1px gold edge
+- [x] 2. Moving a NEW card clears badge
+- [x] 3. Scenes: `ranking-new-badge`
+- [x] 4. 🧪 Host adds pitch in Voting → badge appears on voter within 2 s
+- [x] 5. 🔍 Shots green
 
 (no observability required: presentational)
 
@@ -705,13 +705,13 @@ Produces: NEW badge flow
 Requires: 9.2 complete
 Produces: gated submit, persistent waiting banner
 
-- [ ] 1. Sticky Submit: one red-enamel primary (56px pill, 2px gold edge, Russo caps, flat gold-100). Disabled shows `missing[]` as 48px jump links (specimen `.missing`). Ready state may use the 3.2s `ready-pulse` (guide D3).
-- [ ] 2. Submitted state: "Submitted ✓ — edits still save"
-- [ ] 3. Waiting banner "Waiting on: names" on all tabs during Voting; "All ballots in" when empty
-- [ ] 4. Scenes: `submit-blocked`, `submit-ok`, `waiting-list`
-- [ ] 5. 🧪 Client `missing[]` equals server `missing[]` in fixtures
+- [x] 1. Sticky Submit: one red-enamel primary (56px pill, 2px gold edge, Russo caps, flat gold-100). Disabled shows `missing[]` as 48px jump links (specimen `.missing`). Ready state may use the 3.2s `ready-pulse` (guide D3).
+- [x] 2. Submitted state: "Submitted ✓ — edits still save"
+- [x] 3. Waiting banner "Waiting on: names" on all tabs during Voting; "All ballots in" when empty
+- [x] 4. Scenes: `submit-blocked`, `submit-ok`, `waiting-list`
+- [x] 5. 🧪 Client `missing[]` equals server `missing[]` in fixtures
 - [ ] 6. 🧪 Pitch added after submit flips voter back into waiting list
-- [ ] 7. 🔍 Shots green
+- [x] 7. 🔍 Shots green
 
 (no observability required: server logs `ballot.submitted`)
 
@@ -728,14 +728,14 @@ Authority: guide §6 `results-*` and `closed-voided`, specimen "Results". Voided
 Requires: 4.11 complete
 Produces: Borda headline, score leaderboard, flags, voter lists
 
-- [ ] 1. Borda leaderboard matches guide §5 Result row and specimen "Results" (`.result`, `.medal`): medal discs (gold / neutral / copper, then gold-edged outline), Inter title that wraps, gold bar, Russo 24 score. 1st row gets the 2px gold-300 frame.
-- [ ] 2. Secondary score leaderboard: stacked mini-bars using category fills only inside those bars, total /15, note "Hotness ÷ 2"
-- [ ] 3. Flag chips: amber-300 text + amber-500 outline, plus ▲/▼ and words (never color alone). Copy shape "Crowd #2 · Scores #5" stays; treatment is the guide flag, not a category hue.
-- [ ] 4. Counted and voided voter names listed
-- [ ] 5. Scenes: `results-borda`, `results-flags`, `closed-voided`
-- [ ] 6. 🧪 Render from fixture results equals expected order
-- [ ] 7. 🔍 Titles never truncated at 360 px
-- [ ] 8. 🔍 Shots green
+- [x] 1. Borda leaderboard matches guide §5 Result row and specimen "Results" (`.result`, `.medal`): medal discs (gold / neutral / copper, then gold-edged outline), Inter title that wraps, gold bar, Russo 24 score. 1st row gets the 2px gold-300 frame.
+- [x] 2. Secondary score leaderboard: stacked mini-bars using category fills only inside those bars, total /15, note "Hotness ÷ 2"
+- [x] 3. Flag chips: amber-300 text + amber-500 outline, plus ▲/▼ and words (never color alone). Copy shape "Crowd #2 · Scores #5" stays; treatment is the guide flag, not a category hue.
+- [x] 4. Counted and voided voter names listed
+- [x] 5. Scenes: `results-borda`, `results-flags`, `closed-voided`
+- [x] 6. 🧪 Render from fixture results equals expected order
+- [x] 7. 🔍 Titles never truncated at 360 px
+- [x] 8. 🔍 Shots green
 
 (no observability required: presentational; server logs `tally.computed`)
 
@@ -743,10 +743,10 @@ Produces: Borda headline, score leaderboard, flags, voter lists
 Requires: 10.1, 4.7 complete
 Produces: read-only state with host rename exception
 
-- [ ] 1. Disable all inputs when Closed
-- [ ] 2. Host-only rename for titles/presenter names stays enabled
-- [ ] 3. 🧪 e2e: score tap after close rejected and UI disabled
-- [ ] 4. 🧪 e2e: host rename after close updates all clients; results order unchanged
+- [x] 1. Disable all inputs when Closed
+- [x] 2. Host-only rename for titles/presenter names stays enabled
+- [x] 3. 🧪 e2e: score tap after close rejected and UI disabled
+- [x] 4. 🧪 e2e: host rename after close updates all clients; results order unchanged
 
 (no observability required)
 
@@ -762,29 +762,29 @@ Produces: CSV/MD downloads, chart-card PNGs
 Requires: 4.12, 10.1 complete
 Produces: CSV ×2, Markdown
 
-- [ ] 1. Export endpoint (after Closed) returns rows; voter index randomized per export
-- [ ] 2. CSV 1: voter-pitch rows (voterIndex, pitch, C, F, H, chips, rank position, counted)
-- [ ] 3. CSV 2: pitch summary with all stats, Borda, both ranks, flag
-- [ ] 4. Host toggle to include names (confirm: "de-anonymizes ballots")
-- [ ] 5. Markdown summary: leaderboard, stats, top chips per pitch
-- [ ] 6. 🧪 CSV escaping: commas, quotes, newlines in titles
-- [ ] 7. 🔍 Open both CSVs in a spreadsheet; values match results screen
-- [ ] 8. 👁 server logs `export.raw` / export event with row counts
+- [x] 1. Export endpoint (after Closed) returns rows; voter index randomized per export
+- [x] 2. CSV 1: voter-pitch rows (voterIndex, pitch, C, F, H, chips, rank position, counted)
+- [x] 3. CSV 2: pitch summary with all stats, Borda, both ranks, flag
+- [x] 4. Host toggle to include names (confirm: "de-anonymizes ballots")
+- [x] 5. Markdown summary: leaderboard, stats, top chips per pitch
+- [x] 6. 🧪 CSV escaping: commas, quotes, newlines in titles
+- [x] 7. 🔍 Open both CSVs in a spreadsheet; values match results screen
+- [x] 8. 👁 server logs `export.raw` / export event with row counts
 
 ### 11.2 Chart Cards
 Requires: 11.1, 3.1 complete
 Produces: leaderboard PNG + per-pitch PNG cards
 
-- [ ] 1. Pure SVG builders in `shared/`: leaderboard (Hotness ÷ 2, axis 0–15) and pitch card (Hotness raw 1–10 axis)
-- [ ] 2. Card elements: jittered votes (seeded by pitchId), min–max whisker, IQR band, mean dot with white ring, SD text, total "X.X / 15"
-- [ ] 3. Embed Inter as base64 `@font-face` inside SVG (SVG rendered as image cannot load external fonts)
-- [ ] 4. SVG → canvas → PNG at 2000 px wide; filenames from pitch titles
-- [ ] 5. Measure title width; wrap/scale so titles never truncate
-- [ ] 6. "Download all" button
-- [ ] 7. Scenes: `card-preview`, `leaderboard-preview`
-- [ ] 8. 🧪 SVG snapshot test from fixture
-- [ ] 9. 🔍 Render 3 cards + leaderboard via Playwright; view PNGs for clipped/overlapping labels; compare to Hot Takes references. These PNGs stay light (guide D2). Do not restyle them with `we-rankin-tokens.css`.
-- [ ] 10. 🔍 Fix title typos via host rename, re-export
+- [x] 1. Pure SVG builders in `shared/`: leaderboard (Hotness ÷ 2, axis 0–15) and pitch card (Hotness raw 1–10 axis)
+- [x] 2. Card elements: jittered votes (seeded by pitchId), min–max whisker, IQR band, mean dot with white ring, SD text, total "X.X / 15"
+- [x] 3. Embed Inter as base64 `@font-face` inside SVG (SVG rendered as image cannot load external fonts)
+- [x] 4. SVG → canvas → PNG at 2000 px wide; filenames from pitch titles
+- [x] 5. Measure title width; wrap/scale so titles never truncate
+- [x] 6. "Download all" button
+- [x] 7. Scenes: `card-preview`, `leaderboard-preview`
+- [x] 8. 🧪 SVG snapshot test from fixture
+- [x] 9. 🔍 Render 3 cards + leaderboard via Playwright; view PNGs for clipped/overlapping labels; compare to Hot Takes references. These PNGs stay light (guide D2). Do not restyle them with `we-rankin-tokens.css`.
+- [x] 10. 🔍 Fix title typos via host rename, re-export
 
 (no observability required: client-side rendering)
 
@@ -800,21 +800,21 @@ Produces: verified deployed build, host kit, Go/No-Go
 Requires: 10 complete
 Produces: `npm run e2e` against local dev
 
-- [ ] 1. Playwright: host + 3 player contexts → Lobby → Closed; screenshot per phase
-- [ ] 2. Cases: presenter exclusion, late joiner becomes spectator, unsubmitted voided, pitch added during Voting, reclaim after cleared storage
-- [ ] 3. 🧪 Final Borda order equals fixture expectation
-- [ ] 4. 🧪 Voided voter absent from counted list
-- [ ] 5. 👁 No `write.failed` or ERROR lines in server log during run
+- [x] 1. Playwright: host + 3 player contexts → Lobby → Closed; screenshot per phase
+- [x] 2. Cases: presenter exclusion, late joiner becomes spectator, unsubmitted voided, pitch added during Voting, reclaim after cleared storage
+- [x] 3. 🧪 Final Borda order equals fixture expectation
+- [x] 4. 🧪 Voided voter absent from counted list
+- [x] 5. 👁 No `write.failed` or ERROR lines in server log during run
 
 ### 12.2 Load
 Requires: 12.1 complete
 Produces: `npm run sim` results
 
-- [ ] 1. `scripts/sim.ts`: 25 WebSocket bots join, score all, rank, submit
-- [ ] 2. Measure send→`view` receipt latency
-- [ ] 3. 🧪 0 errors; p95 ≤2 s
-- [ ] 4. 👁 `metrics` after run: `writes_failed`=0, `rate_limited`=0
-- [ ] 5. 🔍 Estimate daily requests vs Workers Free limit; record headroom
+- [x] 1. `scripts/sim.ts`: 25 WebSocket bots join, score all, rank, submit
+- [x] 2. Measure send→`view` receipt latency
+- [x] 3. 🧪 0 errors; p95 ≤2 s
+- [x] 4. 👁 `metrics` after run: `writes_failed`=0, `rate_limited`=0
+- [x] 5. 🔍 Estimate daily requests vs Workers Free limit; record headroom
 
 ### 12.3 Real Devices
 Requires: 1.4, 9 complete
@@ -841,7 +841,7 @@ Produces: rehearsal evidence
 Requires: 12.4 complete
 Produces: printed cheat sheet, T-60 checklist
 
-- [ ] 1. One-page cheat sheet: links, phase order, what "voided" means, raw JSON/CSV-with-names de-anonymize ballots, paper fallback steps
+- [x] 1. One-page cheat sheet: links, phase order, what "voided" means, raw JSON/CSV-with-names de-anonymize ballots, paper fallback steps
 - [ ] 2. Pre-print paper rank sheets (1…N) as fallback
 - [ ] 3. Save host link in 2 places
 - [ ] 4. T-60 min checks: `/api/health` 200, create-session works, 2 phones join, tail open
@@ -867,3 +867,9 @@ Go when: rehearsal clean, kit printed, T-60 checklist passes
 - 2026-11-16: Checklist 4.1–4.12. Session Durable Object now owns the SQLite schema, host-secret session create, hibernating WebSocket auth, zod commands, private views, roster and phase rules, pitches, notes, ballots, tally, rate limit, raw export, and the 30-day alarm. Worker tests cover the scripted six-voter tally, privacy, and forced A1/A2 failures.
 - 2026-11-16: Checklist 5.1–5.4. The session page reconnects with backoff, replaces the store from each view, queues writes until ack, and shows the Saved / Saving / Offline pill. Host sockets render the A1/A2 banner with raw JSON download. `client.error` is logged at warn with the player id.
 - 2026-11-16: Checklist 6.1–6.3. Landing creates a session and shows copyable player and host links. Join stores the player id in localStorage and a cookie. The roster shows Host, Voter, and Spectator, a read-only lineup, the spectator notice, and host confirmations for promote, remove, and release. Two browser tabs saw both joins.
+- 2026-11-16: Checklist 7.1–7.3. Host console adds pitches, confirms phase changes, lists who has not submitted, and downloads raw JSON. Debug counts come from the host view. Presenter fields lock once voting opens. Scene assertions passed. The full shot run is 71s, so 3.4 item 10 (≤60s) is open again.
+- 2026-11-16: Checklist 8.1–8.3. Notes shows score pads, chip groups, locked own and upcoming pitches, and N/M scored. The presenting pitch stays first. Notes, Rank, and Players now switch the session panel.
+- 2026-11-16: Checklist 9.1–9.3. Rank uses dnd-kit for handle drag and up/down buttons. Unplaced pitches show NEW. Submit stays disabled while `missing[]` has gaps, and voting shows who is still out. A pitch added after submit is not yet covered by an automated test. Phone checks in the section go-when are still open.
+- 2026-11-16: Checklist 10.1–10.2. Closed sessions show the Borda board, stacked score bars, disagreement flags, and counted versus voided names. Score, chip, rank, roster, and pitch-remove controls disable. Host title and presenter-name rename stays on. `e2e/closed-flow.ts` checks a rejected score and a rename that leaves rank order alone.
+- 2026-11-16: Checklist 11.1–11.2. Closed export adds ballots CSV, summary CSV, Markdown, and a chart JSON feed. Voter indexes reshuffle per download. Names require the "de-anonymizes ballots" confirm. Chart SVGs stay on the light Hot Takes palette and embed Inter. The host "Download all" button writes 2000px PNGs.
+- 2026-11-16: Checklist 12.1–12.2 passed locally. `npm run e2e` (host Ada, Bea, Cam, Dee, late Eve) wrote `shots/e2e/{lobby,pitching,voting,closed}.png`. Board order was Alpha, Beta, Gamma, Delta, the hand tally for that four-pitch ballot, not the six-voter domain fixture. Dee was voided and absent from the counted list. Cam's page was closed and a new socket with no player id got `name_taken`, then `player.reclaimed`. Server log had no `write.failed` and no `"level":"error"`. `npm run sim` wrote `shots/e2e/sim.json`: 25 bots, 325 acks, 0 errors, p95 11 ms, `writes_failed` 0, `rate_limited` 0. Headroom: about 30 people × 40 requests ≈ 1,200 against the Workers Free 100,000 requests/day, about 98% left. Deployed `/api/health` returned 200. `docs/host-kit.md` and `docs/paper-rank-sheet.md` are written. Phones, printing, the two saved host links, T-60 on cellular, and the workers.dev multi-device rehearsal are still open.

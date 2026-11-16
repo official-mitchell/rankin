@@ -1,4 +1,4 @@
-// View store and selectors for checklist 5.2.
+// View store and selectors for checklist 5.2. Unplaced ballot ids stand in for new pitches (checklist 9.3).
 import { eligiblePitches, missingItems, type BallotDraft } from "@we-rankin/shared";
 import type { ClientView, MissingItem, Pitch, PlayerRole } from "@we-rankin/shared";
 import type { ConnectionStatus } from "./connection";
@@ -41,7 +41,7 @@ export function myMissing(state: RealtimeState): MissingItem[] {
     pitches: view.pitches,
     scores: view.scores ?? [],
     ballot,
-    newPitchIds: [],
+    newPitchIds: view.ballot.order.filter((id) => !view.ballot?.placed.includes(id)),
   });
 }
 

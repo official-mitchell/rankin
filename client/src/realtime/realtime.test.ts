@@ -145,6 +145,7 @@ describe("store selectors", () => {
       { kind: "score", pitchId: "other", category: "compellingness" },
       { kind: "score", pitchId: "other", category: "funniness" },
       { kind: "score", pitchId: "other", category: "hotness" },
+      { kind: "unplaced", pitchId: "other" },
     ]);
     expect(waitingOn(state)).toEqual(["Ada"]);
     expect(isSpectator(state)).toBe(false);

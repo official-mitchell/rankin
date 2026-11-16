@@ -1,4 +1,4 @@
-// Domain types for checklist 2.1. Client and server message payloads are filled in for checklist 4.4.
+// Domain types for checklist 2.1. Host view counters were added for checklist 7.3.
 export type Phase = "lobby" | "pitching" | "voting" | "closed";
 
 export type PitchStatus = "upcoming" | "presenting" | "done";
@@ -93,7 +93,14 @@ export type ClientView = {
   ballot?: Ballot;
   missing?: MissingItem[];
   results?: Results;
-  host?: { canStartPitching: boolean; canOpenVoting: boolean; canCloseVoting: boolean };
+  host?: {
+    canStartPitching: boolean;
+    canOpenVoting: boolean;
+    canCloseVoting: boolean;
+    writes_failed: number;
+    reconnects: number;
+    connected: number;
+  };
 };
 
 export type ClientMessageType =

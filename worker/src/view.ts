@@ -1,4 +1,4 @@
-// Per-viewer projection for checklist 4.5. A viewer never receives another player's scores, chips, or ballot.
+// Per-viewer projection for checklist 4.5 and host debug counters (checklist 7.3).
 import { missingItems, type BallotDraft } from "@we-rankin/shared";
 import type {
   Ballot,
@@ -31,6 +31,8 @@ export type ViewState = {
   ballots: Ballot[];
   newPitchIds: string[];
   results: Results | null;
+  writesFailed?: number;
+  reconnects?: number;
 };
 
 export function buildView(state: ViewState, viewer: { playerId: string | null; isHost: boolean }): ClientView {
@@ -60,6 +62,9 @@ export function buildView(state: ViewState, viewer: { playerId: string | null; i
       canStartPitching: state.phase === "lobby",
       canOpenVoting: state.phase === "pitching",
       canCloseVoting: state.phase === "voting",
+      writes_failed: state.writesFailed ?? 0,
+      reconnects: state.reconnects ?? 0,
+      connected: state.players.filter((player) => !player.removed && player.connected).length,
     };
   }
   if (self && !spectator) {

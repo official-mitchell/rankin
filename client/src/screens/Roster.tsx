@@ -1,4 +1,4 @@
-// Lobby roster, lineup, and host actions (checklist 6.3).
+// Lobby roster and lineup (checklist 6.3). Host roster actions hide once closed (checklist 10.2).
 import type { Phase, PlayerRole } from "@we-rankin/shared";
 import { useState } from "react";
 
@@ -36,11 +36,7 @@ export function Roster({
       {isHost ? (
         <section className="panel panel--inset-frame row">
           <p className="eyebrow">Host link is saved on this device</p>
-          {phase === "lobby" ? (
-            <button type="button" className="btn btn--primary btn--block" onClick={() => onAction?.("start")}>
-              Start pitching
-            </button>
-          ) : null}
+          <p className="link-line">Phase controls sit in the host bar.</p>
         </section>
       ) : null}
       <section className="panel panel--quiet">
@@ -55,9 +51,9 @@ export function Roster({
               <span className={player.host ? "tag tag--voter" : player.role === "voter" ? "tag tag--voter" : "tag"}>
                 {player.host ? "Host" : player.role === "voter" ? "Voter" : "Spectator"}
               </span>
-              {isHost && !player.host ? (
+              {isHost && !player.host && phase !== "closed" ? (
                 <span className="roster__actions">
-                  {player.role === "spectator" && phase !== "voting" && phase !== "closed" ? (
+                  {player.role === "spectator" && phase !== "voting" ? (
                     <button type="button" className="btn btn--secondary" onClick={() => setConfirm({ action: "promote", name: player.name })}>
                       Promote
                     </button>

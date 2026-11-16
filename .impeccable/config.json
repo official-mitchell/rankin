@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-11-16T23:03:18.410Z",
+        "reason": "Checklist 11.2 requires Inter embedded in the Hot Takes chart SVGs"
+      }
+    ]
+  }
+}

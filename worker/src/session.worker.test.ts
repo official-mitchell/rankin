@@ -1,6 +1,6 @@
-// Durable Object coverage for checklist section 4.
+// Durable Object coverage for checklist section 4, the raw export log (checklist 7.3), and closed table export (11.1).
 import { env, SELF } from "cloudflare:test";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 type Json = Record<string, unknown>;
 
@@ -95,13 +95,23 @@ describe("Session durable object", () => {
     expect(minted.code).toMatch(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
     const first = await create(["AAAAAA"]);
     const stub = env.SESSION.get(env.SESSION.idFromName(first.code));
-    const dumped = JSON.stringify(await (await stub.fetch("http://session/export", { headers: { "x-host-secret": first.hostSecret } })).json());
+    const logs: string[] = [];
+    const spy = vi.spyOn(console, "log").mockImplementation((line?: unknown) => {
+      logs.push(String(line));
+    });
+    const exported = await (await stub.fetch("http://session/export", { headers: { "x-host-secret": first.hostSecret } })).json();
+    spy.mockRestore();
+    const dumped = JSON.stringify(exported);
     expect(dumped).not.toContain(first.hostSecret);
+    expect(Object.keys(exported as object).sort()).toEqual(["ballots", "chips", "meta", "metrics", "pitches", "players", "results", "scores"]);
+    expect(logs.some((line) => line.includes("export.raw"))).toBe(true);
 
     const second = await create(["AAAAAA", "BBBBBB"]);
     expect(second.code).toBe("BBBBBB");
     const denied = await stub.fetch("http://session/export", { headers: { "x-host-secret": "wrong-secret" } });
     expect(denied.status).toBe(401);
+    const early = await stub.fetch("http://session/export?format=ballots", { headers: { "x-host-secret": first.hostSecret } });
+    expect(early.status).toBe(409);
   });
 
   it("rejects an unauthenticated write, a bad host secret, and restores the socket attachment", async () => {
@@ -350,5 +360,34 @@ describe("Session durable object", () => {
     const closed = new Promise<number>((resolve) => noisy.ws.addEventListener("close", (event) => resolve(event.code)));
     for (let index = 0; index < 30; index += 1) noisy.ws.send(JSON.stringify({ type: "hello" }));
     expect(await closed).toBe(4008);
+  });
+
+  it("exports CSV after close and keeps a renamed title", async () => {
+    const created = await create(["EXPRT2"]);
+    const host = await hello(created.code, created.hostSecret);
+    host.ws.send(JSON.stringify({ type: "join", name: "Ada", clientSeq: 1 }));
+    await host.box.waitFor((message) => message.clientSeq === 1 && message.type === "ack");
+    host.ws.send(JSON.stringify({ type: "host.addPitch", title: 'Say "hi", please', presenterName: "Ada", presenterPlayerId: null, clientSeq: 2 }));
+    await host.box.waitFor((message) => message.clientSeq === 2 && message.type === "ack");
+    host.ws.send(JSON.stringify({ type: "host.startPitching", clientSeq: 3 }));
+    await host.box.waitFor((message) => message.clientSeq === 3 && message.type === "ack");
+    host.ws.send(JSON.stringify({ type: "host.openVoting", clientSeq: 4 }));
+    await host.box.waitFor((message) => message.clientSeq === 4 && message.type === "ack");
+    host.ws.send(JSON.stringify({ type: "host.closeVoting", clientSeq: 5 }));
+    await host.box.waitFor((message) => message.clientSeq === 5 && message.type === "ack");
+    const stub = env.SESSION.get(env.SESSION.idFromName(created.code));
+    const logs: string[] = [];
+    const spy = vi.spyOn(console, "log").mockImplementation((line?: unknown) => {
+      logs.push(String(line));
+    });
+    const csv = await (await stub.fetch("http://session/export?format=ballots", { headers: { "x-host-secret": created.hostSecret } })).text();
+    expect(csv).toContain('"Say ""hi"", please"');
+    const view = host.box.messages.filter((message) => message.type === "view").at(-1) as { view: { pitches: Array<{ id: string }> } };
+    host.ws.send(JSON.stringify({ type: "host.updatePitch", pitchId: view.view.pitches[0]?.id, title: "Renamed pitch", clientSeq: 6 }));
+    await host.box.waitFor((message) => message.clientSeq === 6 && message.type === "ack");
+    const renamed = await (await stub.fetch("http://session/export?format=summary", { headers: { "x-host-secret": created.hostSecret } })).text();
+    spy.mockRestore();
+    expect(renamed).toContain("Renamed pitch");
+    expect(logs.some((line) => line.includes("export.raw") && line.includes("rows"))).toBe(true);
   });
 });

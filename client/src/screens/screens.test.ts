@@ -1,10 +1,17 @@
-// Landing, identity, copy links, and roster visibility for checklist 6.1–6.3.
+// Landing, roster, host console, and results checks for checklist 6, 7, and 10.
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { readPlayerId, writePlayerId } from "./identity";
 import { Landing, createFailure } from "./Landing";
 import { sessionLinks } from "./links";
+import { exportShapeErrors } from "./export-shape";
+import { HostConsole, pitchTitleError, unsubmittedNames } from "./HostConsole";
+import { applyMove } from "@we-rankin/shared";
+import { missingItems } from "@we-rankin/shared";
+import { Notes, progressCount, toggleChip } from "./Notes";
+import { RankList } from "./Rank";
+import { ResultsBoard, flagLabel, scoreOrder } from "./Results";
 import { Roster } from "./Roster";
 
 describe("session screens", () => {
@@ -53,6 +60,178 @@ describe("session screens", () => {
       }),
     );
     expect(host).toContain("Promote");
-    expect(host).toContain("Start pitching");
+    expect(host).not.toContain("Start pitching");
+  });
+
+  it("blocks an empty or overlong pitch title and keeps phase writes behind confirm", () => {
+    expect(pitchTitleError("  ")).toBe("Enter a title.");
+    expect(pitchTitleError("x".repeat(81))).toMatch(/80/);
+    expect(pitchTitleError("Cat Slack")).toBeNull();
+    const players = [
+      { id: "a", name: "Ada", role: "voter" as const, connected: true, submitted: true },
+      { id: "b", name: "Bea", role: "voter" as const, connected: true, submitted: false },
+    ];
+    expect(unsubmittedNames(players)).toEqual(["Bea"]);
+    const idle = renderToStaticMarkup(
+      createElement(HostConsole, {
+        code: "ABCDEF",
+        phase: "pitching",
+        players,
+        pitches: [{ id: "p", title: "Cat Slack", presenterName: "Ada", presenterId: "a", status: "upcoming" }],
+        counters: { writes_failed: 1, reconnects: 2, connected: 2 },
+        hostLink: "https://we-rankin.test/s/ABCDEF#h=secret",
+      }),
+    );
+    expect(idle).not.toContain("data-commit");
+    expect(idle).toContain("Open voting");
+    const dialog = renderToStaticMarkup(
+      createElement(HostConsole, {
+        code: "ABCDEF",
+        phase: "voting",
+        players,
+        pitches: [],
+        counters: { writes_failed: 1, reconnects: 2, connected: 2 },
+        hostLink: "",
+        initialConfirm: "phase",
+        debugOpen: true,
+      }),
+    );
+    expect(dialog).toContain("data-commit=\"phase\"");
+    expect(dialog).toContain("Voids: Bea");
+    expect(dialog).toContain("writes_failed");
+    expect(dialog).toContain("Download raw JSON");
+    expect(dialog).toContain("disabled");
+  });
+
+  it("accepts an export that matches the documented tables", () => {
+    expect(exportShapeErrors({ meta: [{ host_secret_hash: "abc" }], players: [], pitches: [], scores: [], chips: [], ballots: [], results: [], metrics: {} })).toEqual([]);
+    expect(exportShapeErrors({ meta: [] }).length).toBeGreaterThan(0);
+  });
+
+  it("scores from an empty pad and toggles a chip on and off", () => {
+    const pitches = [
+      { id: "p", title: "Cat Slack", presenterName: "Bea", presenterId: "bea", status: "presenting" as const },
+      { id: "mine", title: "Mine", presenterName: "Ada", presenterId: "ada", status: "done" as const },
+      { id: "next", title: "Later", presenterName: "Cam", presenterId: "cam", status: "upcoming" as const },
+    ];
+    const empty = renderToStaticMarkup(createElement(Notes, { phase: "pitching", selfId: "ada", pitches, scores: [], chips: [] }));
+    expect(empty).toContain("Your pitch — no scoring");
+    expect(empty).toContain("Coming up");
+    expect(empty).not.toContain('aria-pressed="true"');
+    const filled = renderToStaticMarkup(
+      createElement(Notes, {
+        phase: "pitching",
+        selfId: "ada",
+        pitches,
+        scores: [
+          { pitchId: "p", category: "compellingness", value: 2 },
+          { pitchId: "p", category: "funniness", value: 2 },
+          { pitchId: "p", category: "hotness", value: 2 },
+        ],
+        chips: [{ pitchId: "p", chipIds: ["huge-market"] }],
+        saved: true,
+      }),
+    );
+    expect(filled).toContain("1/1 scored");
+    expect(filled).toContain("Saved");
+    expect(filled).toContain('aria-pressed="true"');
+    expect(progressCount(pitches, [], "pitching", "ada")).toEqual({ done: 0, total: 1 });
+    expect(toggleChip(["huge-market"], "huge-market")).toEqual([]);
+    expect(toggleChip([], "huge-market")).toEqual(["huge-market"]);
+  });
+
+  it("reorders with applyMove and lists the same gaps the server would", () => {
+    const moved = applyMove({ order: ["a", "b"], placed: ["a"] }, "b", 0);
+    expect(moved).toEqual({ order: ["b", "a"], placed: ["a", "b"] });
+    const pitches = [
+      { id: "a", title: "Cat", presenterName: "Bea", presenterId: null, status: "done" as const },
+      { id: "b", title: "Park", presenterName: "Cam", presenterId: null, status: "done" as const },
+    ];
+    const input = {
+      playerId: "ada",
+      pitches,
+      scores: [] as [],
+      ballot: { order: ["a", "b"], placed: ["a"] },
+      newPitchIds: ["b"],
+    };
+    expect(missingItems(input).some((item) => item.kind === "unplaced" && item.pitchId === "b")).toBe(true);
+    const markup = renderToStaticMarkup(
+      createElement(RankList, {
+        order: ["a", "b"],
+        placed: ["a"],
+        pitches: pitches.map((pitch) => ({ id: pitch.id, title: pitch.title, presenterName: pitch.presenterName })),
+        scores: [],
+        chips: [],
+        missing: missingItems(input),
+        submitted: false,
+      }),
+    );
+    expect(markup).toContain("NEW");
+    expect(markup).toContain("Place Park");
+    expect(markup).toContain("disabled");
+  });
+
+  it("renders Borda order and disagreement flags from fixture results", () => {
+    const pitches = [
+      { id: "a", title: "Uber for Dog Walkers, but the Dogs Pay in Tennis Balls" },
+      { id: "b", title: "Slack for Cats" },
+    ];
+    const rows = [
+      {
+        pitchId: "b",
+        borda: 0.4,
+        bordaRank: 2,
+        firstPlaceCount: 0,
+        categories: emptyStats(4),
+        scoreTotal: 8,
+        scoreRank: 1,
+        disagreement: { direction: "scores" as const, bordaRank: 2, scoreRank: 1 },
+      },
+      {
+        pitchId: "a",
+        borda: 0.82,
+        bordaRank: 1,
+        firstPlaceCount: 1,
+        categories: emptyStats(3),
+        scoreTotal: 6,
+        scoreRank: 2,
+        disagreement: { direction: "crowd" as const, bordaRank: 1, scoreRank: 2 },
+      },
+    ];
+    expect(scoreOrder(rows).map((row) => row.pitchId)).toEqual(["b", "a"]);
+    expect(flagLabel(rows[0])).toBe("▼ Crowd #2 · Scores #1");
+    const markup = renderToStaticMarkup(
+      createElement(ResultsBoard, {
+        results: { countedPlayerIds: ["ada"], voidedPlayerIds: ["cam"], pitches: rows },
+        pitches,
+        players: [
+          { id: "ada", name: "Ada" },
+          { id: "cam", name: "Cam" },
+        ],
+      }),
+    );
+    expect(markup.indexOf('data-rank="1"')).toBeLessThan(markup.indexOf('data-rank="2"'));
+    expect(markup).toContain("▲ Crowd #1 · Scores #2");
+    expect(markup).toContain("Cam");
+    expect(markup).toContain("Hotness ÷ 2");
+    expect(markup).not.toContain("text-overflow");
+  });
+
+  it("disables score controls when the session is closed", () => {
+    const markup = renderToStaticMarkup(
+      createElement(Notes, {
+        phase: "closed",
+        selfId: "ada",
+        pitches: [{ id: "p", title: "Cat Slack", presenterName: "Bea", presenterId: "bea", status: "done" }],
+        scores: [],
+        chips: [],
+      }),
+    );
+    expect(markup).toContain("disabled");
   });
 });
+
+function emptyStats(mean: number) {
+  const stats = { mean, sd: 0, min: 1, max: 5, p25: 1, p75: 5 };
+  return { compellingness: stats, funniness: stats, hotness: stats };
+}

@@ -1,4 +1,4 @@
-// Session Durable Object for checklist 4. Authoritative phase machine, hibernating sockets, and SQLite state.
+// Session Durable Object for checklist 4, host counters (7.3), and closed CSV/Markdown/chart data (11).
 import {
   ALERT_A1,
   ALERT_A2,
@@ -8,13 +8,18 @@ import {
   applyPlace,
   applyRemovePitch,
   ballotComplete,
+  ballotCsv,
+  chartPitches,
   computeResults,
+  markdownSummary,
+  summaryCsv,
   missingItems,
   type Ballot,
   type CategoryId,
   type Phase,
   type PitchStatus,
   type PlayerRole,
+  type ExportBundle,
   type Results,
   type Score,
   type SessionSnapshot,
@@ -241,8 +246,55 @@ export class Session {
       results: this.rows(`SELECT json, computed_at FROM results`),
       metrics: readMetrics(this.sql),
     };
-    this.log("info", "export.raw", { sessionCode: meta.code });
-    return Response.json(payload);
+    const format = new URL(request.url).searchParams.get("format");
+    if (!format) {
+      this.log("info", "export.raw", { sessionCode: meta.code, format: "json", rows: payload.scores.length });
+      return Response.json(payload);
+    }
+    if (meta.phase !== "closed") return Response.json({ error: "not_closed" }, { status: 409 });
+    const bundle = this.exportBundle();
+    const includeNames = new URL(request.url).searchParams.get("names") === "1";
+    if (format === "ballots") return this.exportText(ballotCsv(bundle, Math.random, includeNames), "text/csv; charset=utf-8", "ballots.csv", meta.code);
+    if (format === "summary") return this.exportText(summaryCsv(bundle), "text/csv; charset=utf-8", "summary.csv", meta.code);
+    if (format === "markdown") return this.exportText(markdownSummary(bundle), "text/markdown; charset=utf-8", "results.md", meta.code);
+    if (format === "charts") {
+      const pitches = chartPitches(bundle);
+      this.log("info", "export.raw", { sessionCode: meta.code, format, rows: pitches.length });
+      return Response.json({ pitches });
+    }
+    return Response.json({ error: "bad_format" }, { status: 400 });
+  }
+
+  private exportText(body: string, contentType: string, filename: string, sessionCode: string): Response {
+    const rows = Math.max(0, body.split("\n").filter((line) => line.length > 0).length - (contentType.startsWith("text/csv") ? 1 : 0));
+    this.log("info", "export.raw", { sessionCode, format: filename, rows });
+    return new Response(body, {
+      headers: { "content-type": contentType, "content-disposition": `attachment; filename="${filename}"` },
+    });
+  }
+
+  private exportBundle(): ExportBundle {
+    const snapshot = this.snapshot();
+    const pitches = this.rows(`SELECT id, title, presenter_name FROM pitches ORDER BY position`) as Array<{
+      id: string;
+      title: string;
+      presenter_name: string;
+    }>;
+    const chips = this.rows(`SELECT player_id, pitch_id, chip_id FROM chips`) as Array<{
+      player_id: string;
+      pitch_id: string;
+      chip_id: string;
+    }>;
+    const stored = this.rows(`SELECT json FROM results`) as Array<{ json: string }>;
+    const parsed = stored[0] ? (JSON.parse(stored[0].json) as Results) : null;
+    return {
+      players: snapshot.players,
+      pitches: pitches.map((pitch) => ({ id: pitch.id, title: pitch.title, presenterName: pitch.presenter_name })),
+      scores: snapshot.scores,
+      chips: chips.map((chip) => ({ playerId: chip.player_id, pitchId: chip.pitch_id, chipId: chip.chip_id })),
+      ballots: snapshot.ballots,
+      results: parsed ?? computeResults(snapshot),
+    };
   }
 
   private async dispatch(ws: WebSocket, command: ClientCommand): Promise<void> {
@@ -679,6 +731,10 @@ export class Session {
     };
   }
 
+  private metric(name: string): number {
+    return readMetrics(this.sql)[name] ?? 0;
+  }
+
   private viewState(): ViewState {
     const meta = this.meta();
     const live = new Set(
@@ -718,6 +774,8 @@ export class Session {
       ballots,
       newPitchIds: this.pitchRows().filter((pitch) => pitch.added_in_voting === 1).map((pitch) => pitch.id),
       results: resultsRow[0] ? (JSON.parse(resultsRow[0].json) as Results) : null,
+      writesFailed: this.metric("writes_failed"),
+      reconnects: this.metric("reconnects"),
     };
   }
 

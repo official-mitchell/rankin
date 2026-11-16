@@ -1,4 +1,4 @@
-// Ordered write queue for checklist 5.3. Optimistic edits use the shared ballot helpers.
+// Ordered write queue for checklist 5.3 and host console writes (checklist 7).
 import { applyMove, applyPlace } from "@we-rankin/shared";
 import type { CategoryId, ClientView } from "@we-rankin/shared";
 
@@ -13,7 +13,13 @@ export type WriteBody =
   | { type: "host.promote"; name: string }
   | { type: "host.removePlayer"; name: string }
   | { type: "host.releaseName"; name: string }
-  | { type: "host.startPitching" };
+  | { type: "host.startPitching" }
+  | { type: "host.openVoting" }
+  | { type: "host.closeVoting" }
+  | { type: "host.addPitch"; title: string; presenterName: string; presenterPlayerId: string | null }
+  | { type: "host.updatePitch"; pitchId: string; title?: string; presenterName?: string; presenterPlayerId?: string | null }
+  | { type: "host.removePitch"; pitchId: string }
+  | { type: "host.setStatus"; pitchId: string; status: "upcoming" | "presenting" | "done" };
 
 export type PendingWrite = {
   clientSeq: number;

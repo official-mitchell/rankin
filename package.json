@@ -8,8 +8,8 @@
     "build": "npm run build -w client",
     "test": "vitest run",
     "shots": "node --experimental-strip-types scripts/shots.ts",
-    "e2e": "echo 'playwright suite lands in checklist 8' && exit 0",
-    "sim": "echo 'load sim lands in checklist 8' && exit 0"
+    "e2e": "node --experimental-strip-types e2e/qa-flow.ts",
+    "sim": "node --experimental-strip-types scripts/sim.ts"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "0.12.21",

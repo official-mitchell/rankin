@@ -1,0 +1,8 @@
+{
+  "name": "@we-rankin/worker",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@we-rankin/shared": "*"
+  }
+}

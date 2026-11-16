@@ -1,0 +1,5 @@
+# Local Wrangler secrets. Copy to .dev.vars (gitignored).
+# Prod: npx wrangler secret put CREATE_KEY
+# CREATE_KEY is never a VITE_ or Vercel public variable.
+CREATE_KEY=
+LOG_LEVEL=debug

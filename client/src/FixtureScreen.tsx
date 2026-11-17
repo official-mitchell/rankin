@@ -1,5 +1,5 @@
 // Dev-only fixture screen. Frozen clock, seeded RNG, animations off (checklist 3.3 and 7).
-// Results scenes are checklist 10.1. 2026-11-16: landing fixtures hide the connection pill and player tabs.
+// Results scenes are checklist 10.1. 2026-11-16: landing fixtures hide the connection pill and player tabs. Shell flags are always booleans so exactOptionalPropertyTypes accepts them.
 import { useRef, useState, type ReactNode } from "react";
 import { ALERT_A1, ALERT_A2, leaderboardSvg, pitchCardSvg, type ChartPitch, type PitchResult, type Results } from "@we-rankin/shared";
 import type { SceneName } from "../fixtures/scenes";
@@ -70,7 +70,7 @@ function sceneFrame(
 ) {
   return (
     <div className="is-frozen" data-scene={scene}>
-      <Shell phase={phase} tab="Players" onTab={() => undefined} showConn={shell.showConn} showTabs={shell.showTabs}>
+      <Shell phase={phase} tab="Players" onTab={() => undefined} showConn={shell.showConn ?? true} showTabs={shell.showTabs ?? true}>
         {body}
       </Shell>
     </div>

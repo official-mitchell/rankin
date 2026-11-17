@@ -1,4 +1,4 @@
-// Notes: score pads, chips, and the presenting pitch (checklist 8.1–8.3). Closed locks every control (checklist 10.2).
+// Notes: score pads, chips, and the presenting pitch (checklist 8.1–8.3). Closed locks every control (checklist 10.2). Optional card props are omitted when unset so exactOptionalPropertyTypes accepts the build.
 import { CATEGORIES, CHIP_GROUPS, type CategoryId, type Phase, type PitchStatus } from "@we-rankin/shared";
 import { useEffect, useRef } from "react";
 import type { WriteBody } from "../realtime/queue";
@@ -79,14 +79,21 @@ export function Notes({
           kind={cardKind(pitch, phase, selfId)}
           scores={scores.filter((score) => score.pitchId === pitch.id)}
           chipIds={chips.find((set) => set.pitchId === pitch.id)?.chipIds ?? []}
-          focusRef={pitch.id === focusId ? focusRef : undefined}
           locked={phase === "closed"}
-          onWrite={onWrite}
+          {...(pitch.id === focusId ? { focusRef } : {})}
+          {...(onWrite ? { onWrite } : {})}
         />
       ))}
       {upcoming.length > 0 ? <p className="eyebrow">Coming up</p> : null}
       {upcoming.map((pitch) => (
-        <PitchCard key={pitch.id} pitch={pitch} kind="upcoming" scores={[]} chipIds={[]} onWrite={onWrite} />
+        <PitchCard
+          key={pitch.id}
+          pitch={pitch}
+          kind="upcoming"
+          scores={[]}
+          chipIds={[]}
+          {...(onWrite ? { onWrite } : {})}
+        />
       ))}
     </div>
   );

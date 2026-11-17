@@ -1,4 +1,4 @@
-// Ranking list, NEW pitches, and submit gate (checklist 9.1–9.3). Closed disables moves (checklist 10.2).
+// Ranking list, NEW pitches, and submit gate (checklist 9.1–9.3). Closed disables moves (checklist 10.2). The handle sets role and tabIndex itself; sortable attributes that repeat those keys are dropped.
 import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, closestCenter, type DragEndEvent, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -130,7 +130,14 @@ function RankCard({
       className={isNew ? "rank rank--new" : sortable.isDragging ? "rank rank--dragging" : "rank"}
       id={`pitch-${pitch.id}`}
     >
-      <div className="rank__handle" role="button" tabIndex={0} aria-label={`Drag ${pitch.title}`} {...sortable.attributes} {...sortable.listeners}>
+      <div
+        className="rank__handle"
+        aria-label={`Drag ${pitch.title}`}
+        {...sortable.attributes}
+        role="button"
+        tabIndex={0}
+        {...sortable.listeners}
+      >
         <i />
       </div>
       <div className="rank__pos">{index + 1}</div>

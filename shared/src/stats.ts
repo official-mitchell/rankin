@@ -51,7 +51,7 @@ export function percentile(values: readonly number[], p: number): number | null 
   return lowValue + (highValue - lowValue) * (index - low);
 }
 
-/** Compellingness mean + Funniness mean + Hotness mean × 0.5. */
+/** Compellingness mean + Investability mean + Hotness mean × 0.5. */
 export function scoreTotal(
   compellingness: number | null,
   funniness: number | null,

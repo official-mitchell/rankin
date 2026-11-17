@@ -1,8 +1,8 @@
-// Landing and the created-session card.
+// Landing and the created-session card. Sessions this device has hosted or joined stay listed across a refresh.
 // 2026-11-16: two open buttons, Become the Game Master and Join a game. No create-key field. A pasted link or a bare session code both open the session. The join form can return to those two buttons. The choice screen explains who starts a session and who joins one. The ready card can regenerate the code or replace it with a 6-character name.
 import { useEffect, useState, type FormEvent } from "react";
 import { CODE_ALPHABET, CODE_LENGTH } from "@we-rankin/shared";
-import { forgetSession, hostSecretKey, sessionEditedAt, touchSession } from "../host-secret";
+import { forgetSession, hostSecretKey, listDeviceSessions, touchSession } from "../host-secret";
 import { hostLinkKey, sessionLinks, sessionTarget } from "./links";
 
 export type CreatedSession = { code: string; player: string; host: string };
@@ -242,39 +242,32 @@ export function createFailure(status: number): string | null {
   return null;
 }
 
-function savedSessionCodes(): string[] {
-  const prefix = "we-rankin:host:";
-  const codes: string[] = [];
-  for (let index = 0; index < window.localStorage.length; index += 1) {
-    const key = window.localStorage.key(index) ?? "";
-    if (key.startsWith(prefix)) codes.push(key.slice(prefix.length));
-  }
-  return codes.sort((left, right) => (sessionEditedAt(right, window.localStorage) ?? 0) - (sessionEditedAt(left, window.localStorage) ?? 0));
-}
-
 function SavedSessions({ onEnter }: { onEnter?: (path: string) => void }) {
-  const [codes, setCodes] = useState(savedSessionCodes);
-  if (codes.length === 0) return null;
+  const [sessions, setSessions] = useState(() => listDeviceSessions(window.localStorage));
+  if (sessions.length === 0) return null;
   return (
     <section className="panel panel--quiet row">
       <p className="eyebrow">Sessions on this device</p>
-      {codes.map((code) => {
-        const edited = sessionEditedAt(code, window.localStorage);
+      {sessions.map((session) => {
+        const who = session.role === "host" ? "Game master" : session.name ? `Player ${session.name}` : "Player";
         return (
-          <div key={code} className="row">
-            <button type="button" className="btn btn--secondary btn--block" onClick={() => onEnter?.(`/s/${code}`)}>
-              Rejoin {code}
+          <div key={session.code} className="row">
+            <button type="button" className="btn btn--secondary btn--block" onClick={() => onEnter?.(`/s/${session.code}`)}>
+              Rejoin {session.code}
             </button>
-            <p className="label">{edited ? `Last edited ${new Date(edited).toLocaleString()}` : "Last edited unknown"}</p>
+            <p className="label">
+              {who}
+              {session.editedAt ? ` · Last opened ${new Date(session.editedAt).toLocaleString()}` : ""}
+            </p>
             <button
               type="button"
               className="btn btn--ghost btn--block"
               onClick={() => {
-                forgetSession(code, window.localStorage);
-                setCodes(savedSessionCodes());
+                forgetSession(session.code, window.localStorage);
+                setSessions(listDeviceSessions(window.localStorage));
               }}
             >
-              Remove {code}
+              Remove {session.code}
             </button>
           </div>
         );

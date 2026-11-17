@@ -1,4 +1,5 @@
 // Light Hot Takes chart cards (checklist 11.2). These SVGs do not use the app tokens.
+import { CATEGORIES } from "./config";
 import type { ExportBundle } from "./table-export";
 import type { CategoryId, CategoryStats } from "./types";
 
@@ -154,7 +155,8 @@ function laneSvg(pitch: ChartPitch, category: CategoryId, y: number): string {
       : `<circle cx="${scale(stats.mean)}" cy="${mid}" r="12" fill="${FILLS[category]}" stroke="#ffffff" stroke-width="4"/>`;
   const sd = stats.sd === null ? "SD —" : `SD ${stats.sd.toFixed(2)}`;
   const axisLabel = category === "hotness" ? "1–10" : "1–5";
-  return `${text(48, y + 40, 28, INK, "start", category)}${text(x1, y + 40, 22, MUTED, "end", axisLabel)}${whisker}${band}${dots}${mean}${text(1720, mid + 8, 24, MUTED, "start", sd)}`;
+  const label = CATEGORIES.find((item) => item.id === category)?.label ?? category;
+  return `${text(48, y + 40, 28, INK, "start", label)}${text(x1, y + 40, 22, MUTED, "end", axisLabel)}${whisker}${band}${dots}${mean}${text(1720, mid + 8, 24, MUTED, "start", sd)}`;
 }
 
 function segment(x: number, y: number, value: number, plotLeft: number, plotRight: number, fill: string): string {

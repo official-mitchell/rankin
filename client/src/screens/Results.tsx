@@ -99,7 +99,7 @@ export function ResultsBoard({
               <div className="pitch-result__score">
                 <p className="pitch-result__score-value">{row.scoreTotal === null ? "—" : row.scoreTotal.toFixed(1)}</p>
                 <p className="pitch-result__score-caption">
-                  Total score. Compellingness and Funniness count in full. Hotness ÷ 2, so the highest possible total is 15.
+                  Total score. Compellingness and Investability count in full. Hotness ÷ 2, so the highest possible total is 15.
                 </p>
               </div>
               <dl className="pitch-result__explain">

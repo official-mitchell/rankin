@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChartPitch, ClientView, ServerAlert } from "@we-rankin/shared";
 import { chartFiles, saveBlob } from "../screens/chart-file";
-import { hostSecretKey, touchSession } from "../host-secret";
+import { hostSecretKey, rememberPlayer, touchSession } from "../host-secret";
 import { DebugDock, HostConsole } from "../screens/HostConsole";
 import { Notes, type NotePitch } from "../screens/Notes";
 import { RankList } from "../screens/Rank";
@@ -54,7 +54,14 @@ export function SessionScreen({
         const current = stateRef.current;
         const painted = paintPending(view, current.pending);
         const next = { ...current, view: painted, alert: null };
-        if (window.localStorage.getItem(hostSecretKey(code))) touchSession(code, window.localStorage);
+        const self = painted.self;
+        if (self?.playerId) {
+          const name = painted.players.find((player) => player.id === self.playerId)?.name;
+          if (name) rememberPlayer(code, name, window.localStorage);
+          else touchSession(code, window.localStorage);
+        } else if (window.localStorage.getItem(hostSecretKey(code))) {
+          touchSession(code, window.localStorage);
+        }
         stateRef.current = next;
         setState(next);
       },

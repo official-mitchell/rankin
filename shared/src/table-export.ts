@@ -1,5 +1,5 @@
 // Closed-session CSV and Markdown rows (checklist 11.1). Voter indexes are assigned by the caller’s random source.
-import { CHIPS } from "./config";
+import { CATEGORIES, CHIPS } from "./config";
 import type { Ballot, CategoryId, Results, Score } from "./types";
 
 export type ExportPlayer = { id: string; name: string; role: string; removed: boolean };
@@ -143,7 +143,8 @@ export function markdownSummary(bundle: ExportBundle): string {
       const stats = row.categories[category];
       const mean = stats.mean === null ? "—" : stats.mean.toFixed(2);
       const sd = stats.sd === null ? "—" : stats.sd.toFixed(2);
-      lines.push(`- ${category}: mean ${mean}, sd ${sd}, min ${stats.min ?? "—"}, max ${stats.max ?? "—"}`);
+      const label = CATEGORIES.find((item) => item.id === category)?.label ?? category;
+      lines.push(`- ${label}: mean ${mean}, sd ${sd}, min ${stats.min ?? "—"}, max ${stats.max ?? "—"}`);
     }
     const counts = new Map<string, number>();
     for (const chip of bundle.chips) {

@@ -20,13 +20,13 @@ export type CategoryConfig = {
 
 export const CATEGORIES: readonly CategoryConfig[] = [
   { id: "compellingness", label: "Compellingness", min: 1, max: 5, weight: 1 },
-  { id: "funniness", label: "Funniness", min: 1, max: 5, weight: 1 },
+  { id: "funniness", label: "Investability", min: 1, max: 5, weight: 1 },
   { id: "hotness", label: "Hotness", min: 1, max: 10, weight: 0.5 },
 ];
 
 export const HOTNESS_WEIGHT = 0.5;
 
-/** Compellingness max + Funniness max + Hotness max × 0.5. */
+/** Compellingness max + Investability max + Hotness max × 0.5. */
 export const MAX_SCORE_TOTAL = CATEGORIES.reduce((sum, category) => sum + category.max * category.weight, 0);
 
 export type ChipGroupId = "investable" | "cautious";

@@ -1,4 +1,4 @@
-/* Join, landing, roster, host console, and results recipes (checklist 6, 7, and 10). */
+/* Join, landing, roster, host console, and results recipes. 2026-11-16: first-visit rules list. */
 .row { display: flex; flex-direction: column; gap: var(--space-3); }
 .panel { position: relative; background: var(--bg-panel); border: var(--border-medium) solid var(--border-gold); border-radius: var(--radius-lg); padding: var(--space-4); box-shadow: var(--shadow-panel), var(--glow-gold); }
 .panel--inset-frame::after { content: ""; position: absolute; inset: var(--space-2); border: 1px solid rgba(190, 145, 52, 0.22); border-radius: calc(var(--radius-lg) - 4px); pointer-events: none; }
@@ -30,9 +30,12 @@
 .led--ok { background: var(--green-300); }
 .input:disabled { opacity: 0.45; }
 .modal-scrim { position: fixed; inset: 0; z-index: 4; display: grid; align-items: end; background: var(--bg-scrim); padding: var(--space-4); }
+.modal-scrim--center { align-items: center; }
+.modal--scroll { max-height: 100%; overflow: auto; }
 .modal { background: var(--bg-panel-raised); border: 1px solid var(--border-gold); border-radius: var(--radius-lg); padding: var(--space-5); }
 .modal__title { margin: 0 0 var(--space-3); font: 400 18px/1.2 var(--font-display); color: var(--text-gold); text-transform: uppercase; letter-spacing: 0.06em; }
 .modal__actions { display: grid; grid-template-columns: 1fr; gap: var(--space-3); margin-top: var(--space-5); }
+.rules { margin: var(--space-3) 0 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: var(--space-2); color: var(--text-secondary); font-size: 16px; }
 .btn--gold { border-color: transparent; background: var(--surface-gold-enamel); color: var(--text-gold); font: 400 15px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
 .host-bar { position: sticky; top: 0; z-index: 3; }
 .status-pill { display: inline-flex; align-items: center; min-height: 28px; padding: 0 var(--space-3); border-radius: var(--radius-pill); font: 400 var(--type-label)/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }

@@ -1,5 +1,5 @@
 // Dev-only fixture screen. Frozen clock, seeded RNG, animations off (checklist 3.3 and 7).
-// Results scenes are checklist 10.1.
+// Results scenes are checklist 10.1. 2026-11-16: landing fixtures hide the connection pill and player tabs.
 import { useRef, useState, type ReactNode } from "react";
 import { ALERT_A1, ALERT_A2, leaderboardSvg, pitchCardSvg, type ChartPitch, type PitchResult, type Results } from "@we-rankin/shared";
 import type { SceneName } from "../fixtures/scenes";
@@ -62,10 +62,15 @@ function QueueLab() {
   );
 }
 
-function sceneFrame(scene: string, phase: "lobby" | "pitching" | "voting" | "closed", body: ReactNode) {
+function sceneFrame(
+  scene: string,
+  phase: "lobby" | "pitching" | "voting" | "closed",
+  body: ReactNode,
+  shell: { showConn?: boolean; showTabs?: boolean } = {},
+) {
   return (
     <div className="is-frozen" data-scene={scene}>
-      <Shell phase={phase} tab="Players" onTab={() => undefined}>
+      <Shell phase={phase} tab="Players" onTab={() => undefined} showConn={shell.showConn} showTabs={shell.showTabs}>
         {body}
       </Shell>
     </div>
@@ -74,17 +79,33 @@ function sceneFrame(scene: string, phase: "lobby" | "pitching" | "voting" | "clo
 
 export default function FixtureScreen({ scene }: { scene: string }) {
   if (scene === "queue-lab") return <QueueLab />;
-  if (scene === "landing") return sceneFrame(scene, "lobby", <Landing createSession={async () => new Response(null, { status: 204 })} />);
+  const bare = { showConn: false, showTabs: false };
+  if (scene === "landing") {
+    return sceneFrame(scene, "lobby", <Landing intro="open" createSession={async () => new Response(null, { status: 204 })} />, bare);
+  }
+  if (scene === "landing-ready") {
+    return sceneFrame(scene, "lobby", <Landing intro="closed" createSession={async () => new Response(null, { status: 204 })} />, bare);
+  }
+  if (scene === "landing-host") {
+    return sceneFrame(scene, "lobby", <Landing intro="closed" hosting createSession={async () => new Response(null, { status: 204 })} />, bare);
+  }
   if (scene === "create-key-error") {
-    return sceneFrame(scene, "lobby", <Landing initialError="That create key was not accepted." createSession={async () => new Response(null, { status: 401 })} />);
+    return sceneFrame(
+      scene,
+      "lobby",
+      <Landing intro="closed" hosting initialError="That create key was not accepted. Only the game master has this key." createSession={async () => new Response(null, { status: 401 })} />,
+      bare,
+    );
   }
   if (scene === "created") {
     return sceneFrame(
       scene,
       "lobby",
       <Landing
+        intro="closed"
         initialCreated={{ code: "ABCDEF", player: "https://we-rankin.test/s/ABCDEF", host: "https://we-rankin.test/s/ABCDEF#h=secret" }}
       />,
+      bare,
     );
   }
   if (scene === "join" || scene === "join-name-taken" || scene === "join-name-in-use") {

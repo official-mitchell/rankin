@@ -1,4 +1,4 @@
-// Routes: landing, live session, dev fixtures, and a 404 view (checklist 3.2 and 5.1).
+// Routes: landing, live session, dev fixtures, and a 404 view. 2026-11-16: the empty landing hides the connection pill and the player tabs.
 import { lazy, Suspense, useEffect, useState } from "react";
 import { captureHostSecret } from "./host-secret";
 import { SessionScreen } from "./realtime/SessionScreen";
@@ -41,8 +41,9 @@ export function App() {
     );
   }
 
+  const landing = path === "/";
   return (
-    <Shell phase={phase} tab={tab} onTab={setTab}>
+    <Shell phase={phase} tab={tab} onTab={setTab} showConn={!landing} showTabs={!landing}>
       {body}
     </Shell>
   );

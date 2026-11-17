@@ -1,4 +1,4 @@
-/* App shell for checklist 3.2. Look ported from we-rankin-components.css (.app-header, .phase-rail, .tabbar). */
+/* App shell. 2026-11-16: phase rail is an unmarked progress sequence. app--solo drops the space reserved for the bottom tabs. */
 .app {
   position: relative;
   z-index: 1;
@@ -12,6 +12,7 @@
   gap: var(--space-4);
   overscroll-behavior: contain;
 }
+.app--solo { padding-bottom: var(--space-4); }
 .star { display: inline-block; width: 0.8em; height: 0.8em; background: var(--red-400); flex: none;
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
 
@@ -20,9 +21,14 @@
 .conn { white-space: nowrap; flex: none; display: inline-flex; align-items: center; gap: var(--space-2); min-height: 32px; padding: 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--bg-control); font-size: var(--type-label); font-weight: 600; color: var(--text-secondary); }
 .led { width: 10px; height: 10px; border-radius: 50%; background: var(--green-300); flex: none; }
 
-.phase-rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; background: var(--bg-inset); border: 1px solid var(--border-gold); border-radius: var(--radius-md); padding: 3px; }
-.phase-rail__step { min-height: 40px; display: grid; place-items: center; text-align: center; border-radius: 9px; font: 400 var(--type-label)/1 var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-disabled); }
-.phase-rail__step--active { background: var(--red-800); color: var(--gold-050); box-shadow: inset 0 -3px 0 var(--border-gold); }
+.phase-rail { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; padding: 0; list-style: none; }
+.phase-rail::before { content: ""; position: absolute; left: 12%; right: 12%; top: 8px; height: 2px; background: var(--border-strong); }
+.phase-rail__step { min-height: 48px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font: 400 13px/1.1 var(--font-display); letter-spacing: 0.02em; text-transform: uppercase; color: var(--text-disabled); }
+.phase-rail__mark { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--text-disabled); background: var(--bg-canvas); position: relative; z-index: 1; }
+.phase-rail__step--done { color: var(--text-muted); }
+.phase-rail__step--done .phase-rail__mark { background: var(--gold-400); border-color: var(--gold-400); }
+.phase-rail__step--active { color: var(--text-gold); }
+.phase-rail__step--active .phase-rail__mark { background: var(--red-400); border-color: var(--gold-400); }
 
 .screen { display: flex; flex-direction: column; gap: var(--space-3); }
 .screen p { margin: 0; color: var(--text-secondary); }

@@ -1,4 +1,4 @@
-// Header, phase rail, and bottom tabs (checklist 3.2). The connection pill shows checklist 5.3 states.
+// Header, phase progress, and session tabs. 2026-11-16: title is Rankin' with a star on each side. The connection pill and the Notes / Rank / Players row are optional so the empty landing can hide both. Phase is a progress list, not a row of controls.
 import type { Phase } from "@we-rankin/shared";
 import type { ReactNode } from "react";
 
@@ -17,6 +17,8 @@ export function Shell({
   onTab,
   conn = "Live",
   status = "online",
+  showConn = true,
+  showTabs = true,
   children,
 }: {
   phase: Phase;
@@ -24,43 +26,56 @@ export function Shell({
   onTab: (tab: (typeof TABS)[number]) => void;
   conn?: string;
   status?: "connecting" | "online" | "offline";
+  showConn?: boolean;
+  showTabs?: boolean;
   children: ReactNode;
 }) {
+  const current = PHASES.findIndex((item) => item.id === phase);
   return (
-    <div className="app">
+    <div className={showTabs ? "app" : "app app--solo"}>
       <header className="app-header">
         <h1 className="title">
           <span className="star" aria-hidden="true" />
-          We Rankin'
+          Rankin'
+          <span className="star" aria-hidden="true" />
         </h1>
-        <span className="conn" data-status={status}>
-          <span className="led" aria-hidden="true" />
-          {conn}
-        </span>
-      </header>
-      <nav className="phase-rail" aria-label="Phase">
-        {PHASES.map((item) => (
-          <span
-            key={item.id}
-            className={item.id === phase ? "phase-rail__step phase-rail__step--active" : "phase-rail__step"}
-          >
-            {item.label}
+        {showConn ? (
+          <span className="conn" data-status={status}>
+            <span className="led" aria-hidden="true" />
+            {conn}
           </span>
-        ))}
-      </nav>
+        ) : null}
+      </header>
+      <ol className="phase-rail" aria-label="Session progress">
+        {PHASES.map((item, index) => {
+          const state = index < current ? "done" : index === current ? "active" : "ahead";
+          return (
+            <li
+              key={item.id}
+              className={`phase-rail__step phase-rail__step--${state}`}
+              aria-current={state === "active" ? "step" : undefined}
+            >
+              <span className="phase-rail__mark" aria-hidden="true" />
+              {item.label}
+            </li>
+          );
+        })}
+      </ol>
       <main className="screen">{children}</main>
-      <nav className="tabbar" aria-label="Sections">
-        {TABS.map((name) => (
-          <button
-            key={name}
-            type="button"
-            className={name === tab ? "tab tab--active" : "tab"}
-            onClick={() => onTab(name)}
-          >
-            {name}
-          </button>
-        ))}
-      </nav>
+      {showTabs ? (
+        <nav className="tabbar" aria-label="Sections">
+          {TABS.map((name) => (
+            <button
+              key={name}
+              type="button"
+              className={name === tab ? "tab tab--active" : "tab"}
+              onClick={() => onTab(name)}
+            >
+              {name}
+            </button>
+          ))}
+        </nav>
+      ) : null}
     </div>
   );
 }

@@ -16,11 +16,22 @@ import { Roster } from "./Roster";
 
 describe("session screens", () => {
   it("shows an inline error for a rejected create key", () => {
-    expect(createFailure(401)).toBe("That create key was not accepted.");
+    expect(createFailure(401)).toBe("That create key was not accepted. Only the game master has this key.");
     const markup = renderToStaticMarkup(
-      createElement(Landing, { initialError: "That create key was not accepted.", createSession: async () => new Response(null, { status: 401 }) }),
+      createElement(Landing, {
+        intro: "closed",
+        hosting: true,
+        initialError: "That create key was not accepted. Only the game master has this key.",
+        createSession: async () => new Response(null, { status: 401 }),
+      }),
     );
-    expect(markup).toContain("That create key was not accepted.");
+    expect(markup).toContain("That create key was not accepted. Only the game master has this key.");
+    const firstVisit = renderToStaticMarkup(createElement(Landing, { intro: "open" }));
+    expect(firstVisit).toContain("A game master starts the session.");
+    expect(firstVisit).not.toContain("create-key");
+    const ready = renderToStaticMarkup(createElement(Landing, { intro: "closed" }));
+    expect(ready).toContain("Become the game master");
+    expect(ready).not.toContain("id=\"create-key\"");
   });
 
   it("puts the exact player and host links on the copy buttons", () => {

@@ -1,6 +1,6 @@
 // Host pitch manager, phase confirms, waiting list, and raw export (checklist 7.1–7.3). Pitch cards are the presentation order: drag the handle to reorder.
 // Closed keeps title and presenter-name rename and drops every other write (checklist 10.2). The presenter list is everyone in the lobby, plus names the game master adds for people who present without joining.
-// Closed also offers CSV, Markdown, and chart downloads (checklist 11).
+// Closed also offers CSV, Markdown, and chart downloads (checklist 11), and a way back to the results board after a reload.
 import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, closestCenter, type DragEndEvent, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -70,6 +70,7 @@ export function HostConsole({
   onDownload,
   onExport,
   onCopy,
+  onViewResults,
 }: {
   code: string;
   phase: Phase;
@@ -85,6 +86,7 @@ export function HostConsole({
   onDownload?: () => void;
   onExport?: (kind: "ballots" | "summary" | "markdown" | "charts", names: boolean) => void;
   onCopy?: (text: string) => void;
+  onViewResults?: () => void;
 }) {
   const [title, setTitle] = useState("");
   const [presenterId, setPresenterId] = useState("");
@@ -152,6 +154,11 @@ export function HostConsole({
         <button type="button" className="btn btn--ghost btn--block" onClick={() => onDownload?.()}>
           Download raw JSON
         </button>
+        {phase === "closed" && onViewResults ? (
+          <button type="button" className="btn btn--primary btn--block" onClick={onViewResults}>
+            View results
+          </button>
+        ) : null}
       </section>
 
       {phase === "closed" ? (

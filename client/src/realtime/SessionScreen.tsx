@@ -1,5 +1,5 @@
 // Session route wiring for checklist 5 and the notes screen (checklist 8). Closed shows results and locks writes (checklist 10). An empty lobby explains the player link and can load sample pitches. The session links stay on screen.
-// Host exports CSV, Markdown, and chart PNGs after close (checklist 11).
+// Host exports CSV, Markdown, and chart PNGs after close (checklist 11). The closed panel can reopen results after a reload.
 import { useEffect, useRef, useState } from "react";
 import type { ChartPitch, ClientView, ServerAlert } from "@we-rankin/shared";
 import { chartFiles, saveBlob } from "../screens/chart-file";
@@ -281,6 +281,7 @@ export function SessionScreen({
             onDownload={() => void download()}
             onExport={(kind, names) => void downloadExport(kind, names)}
             onCopy={(text) => void navigator.clipboard.writeText(text)}
+            onViewResults={() => setSeeResults(true)}
             hideDebug
           />
         ) : null}

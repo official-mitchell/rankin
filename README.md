@@ -1,3 +1,5 @@
+<!-- Deploy: GitHub Action on main runs npm ci, npm run build, npx wrangler deploy. CREATE_KEY is not in the workflow. Custom hostnames go in wrangler.jsonc routes. -->
+
 # We Rankin'
 
 Phone-first pitch-night voting. The Vite React client is served by a Cloudflare Worker. Each session is one SQLite Durable Object.
@@ -19,7 +21,15 @@ Phone-first pitch-night voting. The Vite React client is served by a Cloudflare 
 3. `npx wrangler deploy`
 4. Open `/api/health` on the workers.dev URL from the deploy output.
 
-Git pushes to `main` also deploy when the Cloudflare Git connection is on. Build command: `npm run build`. Deploy command: `npx wrangler deploy`.
+A push to `main` runs `.github/workflows/deploy.yml`: `npm ci`, `npm run build`, `npx wrangler deploy`. GitHub repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` must exist. The workflow does not set `CREATE_KEY`; the secret already on the Worker stays.
+
+A hostname on a zone in this Cloudflare account can be attached in `wrangler.jsonc`:
+
+```jsonc
+"routes": [{ "pattern": "rankin.example.com", "custom_domain": true }]
+```
+
+The next deploy creates the DNS record and certificate. The workers.dev name stays `we-rankin.<account-subdomain>.workers.dev`. Changing that name means a new Worker and a new Durable Object, so existing sessions would not move with it.
 
 ## Rollback
 

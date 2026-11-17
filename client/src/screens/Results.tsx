@@ -1,7 +1,7 @@
-// Borda headline, score bars, flags, and counted versus voided names (checklist 10.1). A closed poll can return to the landing screen to create another session.
-import type { CategoryStats, PitchResult, Results } from "@we-rankin/shared";
+// Pitch-by-pitch results: a box chart for each score, plus a count of every chip. A closed poll can return to the landing screen.
+import { CATEGORIES, CHIP_GROUPS, type CategoryStats, type PitchResult, type Results } from "@we-rankin/shared";
 
-export type ResultPitch = { id: string; title: string };
+export type ResultPitch = { id: string; title: string; presenterName?: string };
 export type ResultPlayer = { id: string; name: string };
 
 export function bordaLabel(value: number): string {
@@ -72,41 +72,76 @@ export function ResultsBoard({
         <p className="label">Not submitted before close — ballot not counted</p>
         <p className="voter-names voter-names--void">{voided.length === 0 ? "None" : voided.join(", ")}</p>
       </section>
-      <section className="panel panel--inset-frame">
-        <p className="eyebrow">★ Borda ranking ★</p>
-        {borda.map((row) => {
-          const flag = flagLabel(row);
-          return (
-            <article key={row.pitchId} className={row.bordaRank === 1 ? "result result--1" : "result"} data-rank={row.bordaRank}>
-              <div className={`medal medal--${row.bordaRank <= 3 ? row.bordaRank : "n"}`}>{row.bordaRank}</div>
-              <div>
-                <h4 className="result__title">{titleOf.get(row.pitchId) ?? row.pitchId}</h4>
-                {flag ? <div className="result__meta"><span className="flag">{flag}</span></div> : null}
-                <div className="bar"><i style={{ width: `${Math.max(0, Math.min(100, row.borda * 100))}%` }} /></div>
-              </div>
-              <div className="result__score"><div className="numeral">{bordaLabel(row.borda)}</div></div>
-            </article>
-          );
-        })}
-      </section>
-      <section className="panel panel--quiet">
-        <p className="eyebrow">Score leaderboard</p>
-        <p className="label">Hotness ÷ 2</p>
-        {scoreOrder(results.pitches).map((row) => {
-          const widths = stackWidths(row.categories);
-          return (
-            <article key={row.pitchId} className="score-row">
-              <h4 className="result__title">{titleOf.get(row.pitchId) ?? row.pitchId}</h4>
-              <div className="stackbar" aria-hidden="true">
-                <i className="stackbar__comp" style={{ width: `${widths.comp}%` }} />
-                <i className="stackbar__fun" style={{ width: `${widths.fun}%` }} />
-                <i className="stackbar__hot" style={{ width: `${widths.hot}%` }} />
-              </div>
-              <p className="numeral score-row__total">{row.scoreTotal === null ? "—" : `${row.scoreTotal.toFixed(1)} / 15`}</p>
-            </article>
-          );
-        })}
-      </section>
+      {borda.map((row) => {
+        const pitch = pitches.find((item) => item.id === row.pitchId);
+        const flag = flagLabel(row);
+        return (
+          <article key={row.pitchId} className="panel pitch-result">
+            <p className="eyebrow">Rank {row.bordaRank}</p>
+            <h3 className="card-title">{pitch?.title ?? titleOf.get(row.pitchId) ?? row.pitchId}</h3>
+            {pitch?.presenterName ? <p className="label">Presented by {pitch.presenterName}</p> : null}
+            <p className="pitch-result__stats">
+              <span>Borda {bordaLabel(row.borda)}</span>
+              <span>First place {row.firstPlaceCount}</span>
+              <span>Score {row.scoreTotal === null ? "—" : row.scoreTotal.toFixed(1)}</span>
+            </p>
+            {flag ? <p className="flag">{flag}</p> : null}
+            <div className="boxcharts">
+              {CATEGORIES.map((category) => (
+                <BoxChart key={category.id} label={category.label} stats={row.categories[category.id]} minScale={category.min} maxScale={category.max} />
+              ))}
+            </div>
+            <PropertyCounts counts={row.chipCounts ?? {}} />
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
+function BoxChart({ label, stats, minScale, maxScale }: { label: string; stats: CategoryStats; minScale: number; maxScale: number }) {
+  const ready = stats.min !== null && stats.max !== null && stats.p25 !== null && stats.p75 !== null && stats.mean !== null;
+  const span = maxScale - minScale;
+  const at = (value: number) => ((value - minScale) / span) * 100;
+  return (
+    <div className="boxchart">
+      <div className="boxchart__label">
+        <span>{label}</span>
+        <span>{stats.mean === null ? "—" : stats.mean.toFixed(1)}</span>
+      </div>
+      {ready ? (
+        <div className="boxchart__track" aria-hidden="true">
+          <i className="boxchart__whisker" style={{ left: `${at(stats.min!)}%`, width: `${at(stats.max!) - at(stats.min!)}%` }} />
+          <i className="boxchart__box" style={{ left: `${at(stats.p25!)}%`, width: `${Math.max(at(stats.p75!) - at(stats.p25!), 2)}%` }} />
+          <i className="boxchart__mean" style={{ left: `${at(stats.mean!)}%` }} />
+        </div>
+      ) : (
+        <p className="label">No scores</p>
+      )}
+    </div>
+  );
+}
+
+function PropertyCounts({ counts }: { counts: Record<string, number> }) {
+  const groups = [
+    { title: "Investable", chips: CHIP_GROUPS.investable },
+    { title: "Cautious", chips: CHIP_GROUPS.cautious },
+  ] as const;
+  return (
+    <div className="property-counts">
+      {groups.map((group) => (
+        <div key={group.title}>
+          <h4 className="eyebrow">{group.title}</h4>
+          <ul>
+            {group.chips.map((chip) => (
+              <li key={chip.id}>
+                <span>{chip.label}</span>
+                <b>{counts[chip.id] ?? 0}</b>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }

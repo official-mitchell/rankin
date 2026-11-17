@@ -202,6 +202,7 @@ describe("session screens", () => {
         scoreTotal: 8,
         scoreRank: 1,
         disagreement: { direction: "scores" as const, bordaRank: 2, scoreRank: 1 },
+        chipCounts: {},
       },
       {
         pitchId: "a",
@@ -212,6 +213,7 @@ describe("session screens", () => {
         scoreTotal: 6,
         scoreRank: 2,
         disagreement: { direction: "crowd" as const, bordaRank: 1, scoreRank: 2 },
+        chipCounts: {},
       },
     ];
     expect(scoreOrder(rows).map((row) => row.pitchId)).toEqual(["b", "a"]);

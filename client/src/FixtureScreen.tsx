@@ -300,6 +300,7 @@ function row(pitchId: string, borda: number, bordaRank: number, scoreTotal: numb
     scoreTotal,
     scoreRank,
     disagreement: flag ? { direction: bordaRank < scoreRank ? "crowd" : "scores", bordaRank, scoreRank } : null,
+    chipCounts: {},
   };
 }
 

@@ -59,6 +59,7 @@ export type PitchResult = {
     bordaRank: number;
     scoreRank: number;
   } | null;
+  chipCounts: Record<string, number>;
 };
 
 export type Results = {
@@ -134,4 +135,5 @@ export type SessionSnapshot = {
   pitches: Pitch[];
   ballots: Ballot[];
   scores: Score[];
+  chips?: Array<{ playerId: string; pitchId: string; chipId: string }>;
 };

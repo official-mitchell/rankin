@@ -31,6 +31,7 @@ const bundle: ExportBundle = {
         scoreTotal: 11,
         scoreRank: 1,
         disagreement: null,
+        chipCounts: {},
         categories: {
           compellingness: { mean: 4, sd: 0, min: 4, max: 4, p25: 4, p75: 4 },
           funniness: { mean: 3, sd: 0, min: 3, max: 3, p25: 3, p75: 3 },

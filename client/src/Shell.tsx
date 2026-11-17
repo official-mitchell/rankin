@@ -42,6 +42,7 @@ export function Shell({
   showTabs = true,
   showPlayers = true,
   rankLocked = false,
+  rankAlert = false,
   onBack,
   children,
 }: {
@@ -54,6 +55,7 @@ export function Shell({
   showTabs?: boolean;
   showPlayers?: boolean;
   rankLocked?: boolean;
+  rankAlert?: boolean;
   onBack?: () => void;
   children: ReactNode;
 }) {
@@ -129,7 +131,7 @@ export function Shell({
             <button
               key={name}
               type="button"
-              className={name === tab ? "tab tab--active" : "tab"}
+              className={name === tab ? "tab tab--active" : name === "Rank" && rankAlert ? "tab tab--ping" : "tab"}
               disabled={name === "Rank" && rankLocked}
               onClick={() => onTab(name)}
             >

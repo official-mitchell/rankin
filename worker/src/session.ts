@@ -739,6 +739,7 @@ export class Session {
       })),
       ballots: state.ballots,
       scores: state.scores,
+      chips: state.chips,
     };
   }
 

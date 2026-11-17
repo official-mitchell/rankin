@@ -52,6 +52,10 @@
 .tab:disabled { opacity: 0.35; }
 .tab small { font: 600 13px/1 var(--font-body); letter-spacing: 0.02em; text-transform: none; color: var(--text-secondary); }
 .tab--active { background: var(--red-800); color: var(--gold-050); box-shadow: inset 0 3px 0 var(--border-gold); }
+.tab { position: relative; }
+.tab--ping { animation: tab-flicker 0.9s steps(2, end) infinite; }
+.tab--ping::after { content: ""; position: absolute; top: 8px; right: 22%; width: 10px; height: 10px; border-radius: 50%; background: var(--red-400); box-shadow: 0 0 0 2px var(--bg-inset); }
+@keyframes tab-flicker { 50% { opacity: 0.35; } }
 
 .is-frozen, .is-frozen * { animation: none !important; transition: none !important; }
 

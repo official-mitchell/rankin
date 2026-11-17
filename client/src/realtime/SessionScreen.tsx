@@ -33,6 +33,9 @@ export function SessionScreen({
   const [state, setState] = useState<RealtimeState>(emptyState);
   const [tab, setTab] = useState<"Notes" | "Rank" | "Players">("Notes");
   const [notesReady, setNotesReady] = useState(false);
+  const [rankAlert, setRankAlert] = useState(false);
+  const [offerResults, setOfferResults] = useState(false);
+  const [seeResults, setSeeResults] = useState(false);
   const [samples, setSamples] = useState<NotePitch[]>([]);
   const [joinIssue, setJoinIssue] = useState<"name_taken" | "name_in_use" | null>(null);
   const stateRef = useRef(state);
@@ -142,7 +145,7 @@ export function SessionScreen({
   const isHost = Boolean(state.view?.self?.isHost);
   const joined = Boolean(playerId);
   return (
-    <Shell phase={state.view?.phase ?? "lobby"} tab={isHost ? tab : tab === "Players" ? "Notes" : tab} onTab={(next) => { if (next === "Rank" && !notesReady) return; setTab(next); }} conn={label} status={state.status} showPlayers={isHost} showTabs={state.view?.phase !== "closed"} showConn={state.status !== "online" || state.pending.length > 0} rankLocked={!notesReady} {...(joined ? { onBack: leaveSession } : {})}>
+    <Shell phase={state.view?.phase ?? "lobby"} tab={isHost ? tab : tab === "Players" ? "Notes" : tab} onTab={(next) => { if (next === "Rank" && !notesReady) return; if (next === "Rank") setRankAlert(false); setTab(next); }} conn={label} status={state.status} showPlayers={isHost} showTabs={!seeResults} showConn={state.status !== "online" || state.pending.length > 0} rankLocked={!notesReady} rankAlert={rankAlert} {...(joined ? { onBack: leaveSession } : {})}>
       <section className="session-screen" data-status={state.status} data-conn={label} data-applied={state.pending.map((item) => item.clientSeq).join(",")} data-player={playerId ?? ""}>
         <AlertBanner alert={state.alert} isHost={isHost} onDownload={() => void download()} />
         {joined && isHost ? (
@@ -150,7 +153,10 @@ export function SessionScreen({
             code={code}
             hostLink={isHost ? window.localStorage.getItem(hostLinkKey(code)) ?? "" : ""}
             ended={state.view?.phase === "closed"}
-            onEnd={() => write({ type: "host.closeVoting" })}
+            onEnd={() => {
+              write({ type: "host.closeVoting" });
+              setOfferResults(true);
+            }}
           />
         ) : null}
         {joined && (state.view?.pitches.length ?? 0) === 0 && (state.view?.phase ?? "lobby") === "lobby" ? (
@@ -190,10 +196,31 @@ export function SessionScreen({
             }}
           />
         ) : null}
-        {!lab && joined && state.view?.phase === "closed" && state.view.results ? (
+        {offerResults && !seeResults ? (
+          <div className="modal-scrim modal-scrim--center">
+            <div className="modal" role="dialog" aria-labelledby="view-results-title">
+              <h3 className="modal__title" id="view-results-title">Session ended</h3>
+              <p>Scoring and ranking are closed. Go view the results.</p>
+              <div className="modal__actions">
+                <button type="button" className="btn btn--primary btn--block" onClick={() => setSeeResults(true)}>
+                  View results
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {!lab && joined && seeResults && !(state.view?.phase === "closed" && state.view.results) ? (
+          <section className="panel panel--quiet row">
+            <p className="notice">Results are on the way.</p>
+            <button type="button" className="btn btn--secondary btn--block" onClick={() => write({ type: "host.closeVoting" })}>
+              Close and tally again
+            </button>
+          </section>
+        ) : null}
+        {!lab && joined && seeResults && state.view?.phase === "closed" && state.view.results ? (
           <ResultsBoard
             results={state.view.results}
-            pitches={state.view.pitches.map((pitch) => ({ id: pitch.id, title: pitch.title }))}
+            pitches={state.view.pitches.map((pitch) => ({ id: pitch.id, title: pitch.title, presenterName: pitch.presenterName }))}
             players={state.view.players.map((player) => ({ id: player.id, name: player.name }))}
             onNewSession={() => {
               window.history.pushState(null, "", "/");
@@ -201,7 +228,7 @@ export function SessionScreen({
             }}
           />
         ) : null}
-        {!lab && joined && state.view?.phase !== "closed" && tab === "Notes" ? (
+        {!lab && joined && !seeResults && tab === "Notes" ? (
           <Notes
             phase={state.view?.phase ?? "lobby"}
             selfId={playerId}
@@ -213,10 +240,13 @@ export function SessionScreen({
             samples={samples}
             onWrite={write}
             onAddSample={(pitch) => write({ type: "host.addPitch", title: pitch.title, presenterName: pitch.presenterName, presenterPlayerId: null })}
-            onSubmit={() => setNotesReady(true)}
+            onSubmit={() => {
+              setNotesReady(true);
+              setRankAlert(true);
+            }}
           />
         ) : null}
-        {!lab && joined && state.view?.phase !== "closed" && tab === "Rank" && state.view?.ballot ? (
+        {!lab && joined && !seeResults && tab === "Rank" && state.view?.ballot ? (
           <RankList
             order={state.view.ballot.order}
             placed={state.view.ballot.placed}
@@ -225,11 +255,11 @@ export function SessionScreen({
             chips={state.view.chips ?? []}
             missing={myMissing(state)}
             submitted={state.view.ballot.submitted}
-            locked={false}
+            locked={state.view.phase === "closed"}
             onWrite={write}
           />
         ) : null}
-        {!lab && joined && state.view?.phase !== "closed" && tab === "Players" && isHost ? (
+        {!lab && joined && !seeResults && tab === "Players" && isHost ? (
           <HostConsole
             code={code}
             phase={state.view?.phase ?? "lobby"}
@@ -254,7 +284,7 @@ export function SessionScreen({
             hideDebug
           />
         ) : null}
-        {!lab && joined && state.view?.phase !== "closed" && tab === "Players" ? (
+        {!lab && joined && !seeResults && tab === "Players" ? (
           <Roster
             players={(state.view?.players ?? []).map((player) => ({ ...player, host: isHost && player.id === playerId }))}
             pitches={(state.view?.pitches ?? []).map((pitch) => ({ id: pitch.id, title: pitch.title, presenterName: pitch.presenterName }))}
@@ -268,7 +298,7 @@ export function SessionScreen({
             }}
           />
         ) : null}
-        {isHost && state.view?.phase !== "closed" ? (
+        {isHost && !seeResults ? (
           <DebugDock
             code={code}
             counters={{

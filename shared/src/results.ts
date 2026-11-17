@@ -44,10 +44,20 @@ export function computeResults(snapshot: SessionSnapshot): Results {
       scoreTotal: row.scoreTotal,
       scoreRank,
       disagreement: disagreement(rank, scoreRank),
+      chipCounts: chipCounts(snapshot, row.pitchId, countedIds),
     };
   });
 
   return { countedPlayerIds, voidedPlayerIds, pitches };
+}
+
+function chipCounts(snapshot: SessionSnapshot, pitchId: string, countedIds: ReadonlySet<string>): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const chip of snapshot.chips ?? []) {
+    if (chip.pitchId !== pitchId || !countedIds.has(chip.playerId)) continue;
+    counts[chip.chipId] = (counts[chip.chipId] ?? 0) + 1;
+  }
+  return counts;
 }
 
 function totalFor(snapshot: SessionSnapshot, pitchId: string, countedIds: ReadonlySet<string>): number | null {

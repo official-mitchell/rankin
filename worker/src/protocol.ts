@@ -52,6 +52,7 @@ export const clientMessageSchema = z.discriminatedUnion("type", [
     clientSeq: seq,
   }),
   z.object({ type: z.literal("host.removePitch"), pitchId: z.string().min(1), clientSeq: seq }),
+  z.object({ type: z.literal("host.reorderPitches"), pitchIds: z.array(z.string().min(1)).max(80), clientSeq: seq }),
   z.object({
     type: z.literal("host.setStatus"),
     pitchId: z.string().min(1),

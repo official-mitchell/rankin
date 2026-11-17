@@ -7,13 +7,11 @@ import {
   applyNewPitch,
   applyPlace,
   applyRemovePitch,
-  ballotComplete,
   ballotCsv,
   chartPitches,
   computeResults,
   markdownSummary,
   summaryCsv,
-  missingItems,
   type Ballot,
   type CategoryId,
   type Phase,
@@ -352,6 +350,8 @@ export class Session {
         return this.updatePitch(attachment, command);
       case "host.removePitch":
         return this.removePitch(attachment, command.pitchId);
+      case "host.reorderPitches":
+        return this.reorderPitches(attachment, command.pitchIds);
       case "host.setStatus":
         return this.setStatus(attachment, command.pitchId, command.status);
       case "host.startPitching":
@@ -473,11 +473,10 @@ export class Session {
     if (!meta || !player) return { ok: false, code: "unauthorized" };
     if (player.removed) return { ok: false, code: "unauthorized" };
     if (player.role !== "voter") return { ok: false, code: "unauthorized" };
-    if (meta.phase === "lobby" || meta.phase === "closed") return { ok: false, code: "bad_transition" };
+    if (meta.phase === "closed") return { ok: false, code: "bad_transition" };
     const pitch = this.pitch(pitchId);
     if (!pitch) return { ok: false, code: "not_found" };
     if (pitch.presenter_player_id === player.id) return { ok: false, code: "own_pitch" };
-    if (meta.phase !== "voting" && pitch.status === "upcoming") return { ok: false, code: "bad_transition" };
     return { ok: true };
   }
 
@@ -501,17 +500,6 @@ export class Session {
   private submitBallot(attachment: Attachment): { ok: true; mutate: boolean } | { ok: false; code: string; missing?: unknown } {
     const ballot = this.requireBallot(attachment);
     if (!ballot.ok) return ballot;
-    const state = this.viewState();
-    const input = {
-      playerId: attachment.playerId!,
-      pitches: state.pitches,
-      scores: state.scores,
-      ballot: ballot.draft,
-      newPitchIds: state.newPitchIds,
-    };
-    if (!ballotComplete(input)) {
-      return { ok: false, code: "incomplete", missing: missingItems(input) };
-    }
     this.saveBallot(attachment.playerId!, ballot.draft.order, ballot.draft.placed, true);
     inc(this.sql, "ballots_submitted");
     this.log("info", "ballot.submitted", { playerId: attachment.playerId ?? undefined });
@@ -594,6 +582,18 @@ export class Session {
     return { ok: true, mutate: true };
   }
 
+  private reorderPitches(attachment: Attachment, pitchIds: string[]): { ok: true; mutate: boolean } | { ok: false; code: string } {
+    if (!this.host(attachment)) return { ok: false, code: "unauthorized" };
+    const meta = this.meta();
+    if (!meta || meta.phase === "closed") return { ok: false, code: "bad_transition" };
+    const rows = this.pitchRows();
+    const known = new Set(rows.map((pitch) => pitch.id));
+    if (pitchIds.length !== rows.length || pitchIds.some((id) => !known.has(id))) return { ok: false, code: "bad_message" };
+    pitchIds.forEach((id, index) => this.sql.exec(`UPDATE pitches SET position = ? WHERE id = ?`, index + 1, id));
+    this.log("info", "pitch.reordered", { sessionCode: meta.code });
+    return { ok: true, mutate: true };
+  }
+
   private setStatus(attachment: Attachment, pitchId: string, status: PitchStatus): { ok: true; mutate: boolean } | { ok: false; code: string } {
     if (!this.host(attachment)) return { ok: false, code: "unauthorized" };
     const pitch = this.pitch(pitchId);
@@ -626,13 +626,25 @@ export class Session {
   }
 
   private createBallots(): void {
+    const meta = this.meta();
+    if (!meta || meta.phase === "closed") return;
     const pitches = this.pitchRows();
     for (const player of this.playerRows()) {
       if (player.removed || player.role !== "voter") continue;
-      if (this.ballot(player.id)) continue;
-      const order = pitches.filter((pitch) => pitch.presenter_player_id !== player.id).map((pitch) => pitch.id);
-      this.saveBallot(player.id, order, order, false);
-      this.log("info", "ballot.created", { playerId: player.id });
+      const eligible = pitches.filter((pitch) => pitch.presenter_player_id !== player.id).map((pitch) => pitch.id);
+      const existing = this.ballot(player.id);
+      if (!existing) {
+        this.saveBallot(player.id, eligible, eligible, false);
+        this.log("info", "ballot.created", { playerId: player.id });
+        continue;
+      }
+      if (meta.phase === "voting") continue;
+      const order = existing.order.filter((id) => eligible.includes(id));
+      for (const id of eligible) if (!order.includes(id)) order.push(id);
+      const known = new Set(existing.order);
+      const placed = order.filter((id) => existing.placed.includes(id) || !known.has(id));
+      const same = order.join() === existing.order.join() && placed.join() === existing.placed.join();
+      if (!same) this.saveBallot(player.id, order, placed, this.ballotSubmitted(player.id));
     }
   }
 
@@ -641,7 +653,6 @@ export class Session {
     const meta = this.meta();
     if (!meta) return { ok: false, code: "not_ready" };
     if (meta.phase === "closed") return { ok: true, mutate: false };
-    if (meta.phase !== "voting") return { ok: false, code: "bad_transition" };
     if (this.failNextTally) {
       this.failNextTally = false;
       throw new Error("forced tally error");
@@ -705,7 +716,7 @@ export class Session {
     const meta = this.meta();
     const player = attachment.playerId ? this.playerById(attachment.playerId) : null;
     if (!meta || !player || player.removed || player.role !== "voter") return { ok: false, code: "unauthorized" };
-    if (meta.phase !== "voting") return { ok: false, code: "bad_transition" };
+    if (meta.phase === "closed") return { ok: false, code: "bad_transition" };
     const draft = this.ballot(player.id);
     if (!draft) return { ok: false, code: "not_found" };
     return { ok: true, draft, submitted: this.ballotSubmitted(player.id) };
@@ -790,6 +801,7 @@ export class Session {
   }
 
   private flush(): void {
+    this.createBallots();
     const state = this.viewState();
     for (const socket of this.ctx.getWebSockets()) {
       if (socket.readyState !== WebSocket.OPEN) continue;

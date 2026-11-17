@@ -1,15 +1,6 @@
 // Closed session: score taps are rejected, and a host rename keeps the Borda order (checklist 10.2).
 import { spawn, type ChildProcess } from "node:child_process";
-import { readFileSync } from "node:fs";
 import { chromium, type Page } from "playwright";
-
-function createKey(): string {
-  const line = readFileSync(".dev.vars", "utf8")
-    .split("\n")
-    .find((entry) => entry.startsWith("CREATE_KEY="));
-  if (!line) throw new Error("CREATE_KEY is missing");
-  return line.slice("CREATE_KEY=".length).trim();
-}
 
 function start(command: string, args: string[]): ChildProcess {
   return spawn(command, args, { stdio: "inherit" });
@@ -44,9 +35,8 @@ try {
   const host = await browser.newContext();
   const page = await host.newPage();
   await page.goto("http://127.0.0.1:5173/");
-  await page.locator("#create-key").fill(createKey());
-  await page.getByRole("button", { name: "Create session" }).click();
-  await page.getByRole("button", { name: "Enter session" }).click();
+  await page.getByRole("button", { name: "Become the Game Master" }).click();
+  await page.getByRole("button", { name: "Create Session" }).click();
   await join(page, "Ada");
 
   const code = new URL(page.url()).pathname.split("/").pop() ?? "";

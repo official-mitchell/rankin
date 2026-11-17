@@ -30,7 +30,16 @@ export function App() {
   let body = <p>That page is not on the card.</p>;
   let phase: "lobby" | "pitching" | "voting" | "closed" = "lobby";
   if (path === "/") {
-    body = <Landing onEnter={(next) => { window.history.pushState(null, "", next); setPath(next); }} />;
+    body = (
+      <Landing
+        onEnter={(next) => {
+          window.history.pushState(null, "", next);
+          const cleaned = captureHostSecret(window.location.href, window.localStorage);
+          if (cleaned) window.history.replaceState(null, "", cleaned);
+          setPath(window.location.pathname);
+        }}
+      />
+    );
   } else if (session) {
     return <SessionScreen code={decodeURIComponent(session[1] ?? "")} />;
   } else if (fixture && FixtureScreen) {

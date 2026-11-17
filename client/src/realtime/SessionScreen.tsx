@@ -1,16 +1,16 @@
-// Session route wiring for checklist 5 and the notes screen (checklist 8). Closed shows results and locks writes (checklist 10).
+// Session route wiring for checklist 5 and the notes screen (checklist 8). Closed shows results and locks writes (checklist 10). An empty lobby explains the player link and can load sample pitches. The session links stay on screen.
 // Host exports CSV, Markdown, and chart PNGs after close (checklist 11).
 import { useEffect, useRef, useState } from "react";
 import type { ChartPitch, ClientView, ServerAlert } from "@we-rankin/shared";
 import { chartFiles, saveBlob } from "../screens/chart-file";
-import { hostSecretKey } from "../host-secret";
-import { HostConsole } from "../screens/HostConsole";
-import { Notes } from "../screens/Notes";
+import { hostSecretKey, touchSession } from "../host-secret";
+import { DebugDock, HostConsole } from "../screens/HostConsole";
+import { Notes, type NotePitch } from "../screens/Notes";
 import { RankList } from "../screens/Rank";
 import { waitingOn, myMissing } from "./store";
 import { JoinPanel } from "../screens/JoinPanel";
 import { readPlayerId, writePlayerId } from "../screens/identity";
-import { hostLinkKey } from "../screens/links";
+import { hostLinkKey, sessionLinks } from "../screens/links";
 import { ResultsBoard } from "../screens/Results";
 import { Roster } from "../screens/Roster";
 import { Shell } from "../Shell";
@@ -32,6 +32,8 @@ export function SessionScreen({
 }) {
   const [state, setState] = useState<RealtimeState>(emptyState);
   const [tab, setTab] = useState<"Notes" | "Rank" | "Players">("Notes");
+  const [notesReady, setNotesReady] = useState(false);
+  const [samples, setSamples] = useState<NotePitch[]>([]);
   const [joinIssue, setJoinIssue] = useState<"name_taken" | "name_in_use" | null>(null);
   const stateRef = useRef(state);
   const managerRef = useRef<ConnectionManager | null>(null);
@@ -48,7 +50,8 @@ export function SessionScreen({
       onView: (view) => {
         const current = stateRef.current;
         const painted = paintPending(view, current.pending);
-        const next = { ...current, view: painted };
+        const next = { ...current, view: painted, alert: null };
+        if (window.localStorage.getItem(hostSecretKey(code))) touchSession(code, window.localStorage);
         stateRef.current = next;
         setState(next);
       },
@@ -139,9 +142,29 @@ export function SessionScreen({
   const isHost = Boolean(state.view?.self?.isHost);
   const joined = Boolean(playerId);
   return (
-    <Shell phase={state.view?.phase ?? "lobby"} tab={tab} onTab={setTab} conn={label} status={state.status}>
+    <Shell phase={state.view?.phase ?? "lobby"} tab={isHost ? tab : tab === "Players" ? "Notes" : tab} onTab={(next) => { if (next === "Rank" && !notesReady) return; setTab(next); }} conn={label} status={state.status} showPlayers={isHost} showTabs={state.view?.phase !== "closed"} showConn={state.status !== "online" || state.pending.length > 0} rankLocked={!notesReady} {...(joined ? { onBack: leaveSession } : {})}>
       <section className="session-screen" data-status={state.status} data-conn={label} data-applied={state.pending.map((item) => item.clientSeq).join(",")} data-player={playerId ?? ""}>
         <AlertBanner alert={state.alert} isHost={isHost} onDownload={() => void download()} />
+        {joined && isHost ? (
+          <SessionDetails
+            code={code}
+            hostLink={isHost ? window.localStorage.getItem(hostLinkKey(code)) ?? "" : ""}
+            ended={state.view?.phase === "closed"}
+            onEnd={() => write({ type: "host.closeVoting" })}
+          />
+        ) : null}
+        {joined && (state.view?.pitches.length ?? 0) === 0 && (state.view?.phase ?? "lobby") === "lobby" ? (
+          <section className="panel panel--quiet row">
+            <p className="notice">Share the player link. People who open it join this lobby. Then add pitches on Players.</p>
+            <button
+              type="button"
+              className="btn btn--secondary btn--block"
+              onClick={() => setSamples((current) => (current.length > 0 ? [] : samplePitches()))}
+            >
+              {samples.length > 0 ? "Hide sample score cards" : "Show sample score cards"}
+            </button>
+          </section>
+        ) : null}
         {state.view?.phase === "voting" ? (
           <p className="notice waiting-banner">
             {waitingOn({ ...state, view: state.view }).length === 0 ? "All ballots in" : `Waiting on: ${waitingOn({ ...state, view: state.view }).join(", ")}`}
@@ -172,20 +195,28 @@ export function SessionScreen({
             results={state.view.results}
             pitches={state.view.pitches.map((pitch) => ({ id: pitch.id, title: pitch.title }))}
             players={state.view.players.map((player) => ({ id: player.id, name: player.name }))}
+            onNewSession={() => {
+              window.history.pushState(null, "", "/");
+              window.dispatchEvent(new PopStateEvent("popstate"));
+            }}
           />
         ) : null}
-        {!lab && joined && tab === "Notes" ? (
+        {!lab && joined && state.view?.phase !== "closed" && tab === "Notes" ? (
           <Notes
             phase={state.view?.phase ?? "lobby"}
             selfId={playerId}
+            selfName={state.view?.players.find((player) => player.id === playerId)?.name ?? null}
             pitches={state.view?.pitches ?? []}
             scores={(state.view?.scores ?? []).map((score) => ({ pitchId: score.pitchId, category: score.category, value: score.value }))}
             chips={state.view?.chips ?? []}
             saved={state.status === "online" && state.pending.length === 0}
+            samples={samples}
             onWrite={write}
+            onAddSample={(pitch) => write({ type: "host.addPitch", title: pitch.title, presenterName: pitch.presenterName, presenterPlayerId: null })}
+            onSubmit={() => setNotesReady(true)}
           />
         ) : null}
-        {!lab && joined && tab === "Rank" && state.view?.ballot ? (
+        {!lab && joined && state.view?.phase !== "closed" && tab === "Rank" && state.view?.ballot ? (
           <RankList
             order={state.view.ballot.order}
             placed={state.view.ballot.placed}
@@ -194,12 +225,11 @@ export function SessionScreen({
             chips={state.view.chips ?? []}
             missing={myMissing(state)}
             submitted={state.view.ballot.submitted}
-            locked={state.view.phase === "closed"}
+            locked={false}
             onWrite={write}
           />
         ) : null}
-        {!lab && joined && tab === "Rank" && !state.view?.ballot ? <p className="notice">Ballots open with voting.</p> : null}
-        {!lab && joined && tab === "Players" && isHost ? (
+        {!lab && joined && state.view?.phase !== "closed" && tab === "Players" && isHost ? (
           <HostConsole
             code={code}
             phase={state.view?.phase ?? "lobby"}
@@ -221,9 +251,10 @@ export function SessionScreen({
             onDownload={() => void download()}
             onExport={(kind, names) => void downloadExport(kind, names)}
             onCopy={(text) => void navigator.clipboard.writeText(text)}
+            hideDebug
           />
         ) : null}
-        {!lab && joined && tab === "Players" ? (
+        {!lab && joined && state.view?.phase !== "closed" && tab === "Players" ? (
           <Roster
             players={(state.view?.players ?? []).map((player) => ({ ...player, host: isHost && player.id === playerId }))}
             pitches={(state.view?.pitches ?? []).map((pitch) => ({ id: pitch.id, title: pitch.title, presenterName: pitch.presenterName }))}
@@ -237,8 +268,101 @@ export function SessionScreen({
             }}
           />
         ) : null}
+        {isHost && state.view?.phase !== "closed" ? (
+          <DebugDock
+            code={code}
+            counters={{
+              writes_failed: state.view?.host?.writes_failed ?? 0,
+              reconnects: state.view?.host?.reconnects ?? 0,
+              connected: state.view?.host?.connected ?? 0,
+            }}
+          />
+        ) : null}
       </section>
     </Shell>
+  );
+}
+
+function leaveSession(): void {
+  window.history.pushState(null, "", "/");
+  window.dispatchEvent(new PopStateEvent("popstate"));
+}
+
+function samplePitches(): NotePitch[] {
+  return [
+    { id: "sample-night", title: "Night market", presenterName: "Ada", presenterId: null, status: "presenting" },
+    { id: "sample-plane", title: "Paper plane", presenterName: "Bo", presenterId: null, status: "done" },
+    { id: "sample-call", title: "Last call", presenterName: "Cid", presenterId: null, status: "done" },
+  ];
+}
+
+function SessionDetails({
+  code,
+  hostLink,
+  ended = false,
+  onEnd,
+}: {
+  code: string;
+  hostLink: string;
+  ended?: boolean;
+  onEnd: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [confirmEnd, setConfirmEnd] = useState(false);
+  const links = sessionLinks(window.location.origin, code, "");
+  const player = links.player;
+  return (
+    <section className="panel panel--quiet row">
+      <button type="button" className="btn btn--ghost btn--block" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
+        {open ? "Hide session details" : `Session ${code}`}
+      </button>
+      {ended ? null : (
+        <button type="button" className="btn btn--danger btn--block" onClick={() => setConfirmEnd(true)}>
+          End session
+        </button>
+      )}
+      {confirmEnd ? (
+        <div className="modal-scrim modal-scrim--center">
+          <div className="modal" role="dialog" aria-labelledby="end-session-title">
+            <h3 className="modal__title" id="end-session-title">End this session?</h3>
+            <p>Scoring and ranking stop. You will see the results.</p>
+            <div className="modal__actions">
+              <button type="button" className="btn btn--secondary btn--block" onClick={() => setConfirmEnd(false)}>
+                Keep going
+              </button>
+              <button
+                type="button"
+                className="btn btn--danger btn--block"
+                onClick={() => {
+                  setConfirmEnd(false);
+                  onEnd();
+                }}
+              >
+                End session
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {open ? (
+        <>
+          <p className="label">Player Link:</p>
+          <p className="link-line">{player}</p>
+          <button type="button" className="btn btn--secondary btn--block" onClick={() => void navigator.clipboard.writeText(player)}>
+            Copy player link
+          </button>
+          {hostLink ? (
+            <>
+              <p className="label">Host Link:</p>
+              <p className="link-line">{hostLink}</p>
+              <button type="button" className="btn btn--secondary btn--block" onClick={() => void navigator.clipboard.writeText(hostLink)}>
+                Copy host link
+              </button>
+            </>
+          ) : null}
+        </>
+      ) : null}
+    </section>
   );
 }
 

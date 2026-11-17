@@ -4,7 +4,6 @@ import { alertForUncaught, APP_NAME, CODE_ALPHABET, CODE_LENGTH } from "@we-rank
 import { createSession } from "./create-session";
 import type { Env } from "./env";
 import { log } from "./log";
-import { safeEqual } from "./secret";
 import { Session } from "./session";
 
 export { Session };
@@ -34,18 +33,8 @@ async function route(request: Request, env: Env, reqId: string): Promise<Respons
     return Response.json({ ok: true, app: APP_NAME });
   }
   if (url.pathname === "/api/sessions" && request.method === "POST") {
-    const body = (await request.json().catch(() => null)) as { createKey?: unknown; codes?: unknown } | null;
-    const provided = typeof body?.createKey === "string" ? body.createKey : "";
-    if (!env.CREATE_KEY || !safeEqual(provided, env.CREATE_KEY)) {
-      log({
-        minLevel: env.LOG_LEVEL,
-        level: "warn",
-        event: "auth.failed",
-        secrets: secretsOf(env),
-        fields: { reqId, path: url.pathname },
-      });
-      return Response.json({ error: "unauthorized" }, { status: 401 });
-    }
+    // 2026-11-16: the game master starts a session from the landing button. A typed create key is not required.
+    const body = (await request.json().catch(() => null)) as { codes?: unknown } | null;
     const codes = Array.isArray(body?.codes) ? body.codes.filter((code): code is string => typeof code === "string") : undefined;
     const created = await createSession(env, codes);
     if (!created) return Response.json({ error: "unavailable" }, { status: 503 });

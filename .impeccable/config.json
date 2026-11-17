@@ -8,6 +8,15 @@
         "value": "inter",
         "createdAt": "2026-11-16T23:03:18.410Z",
         "reason": "Checklist 11.2 requires Inter embedded in the Hot Takes chart SVGs"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "client/src/styles/shell.css"
+        ],
+        "createdAt": "2026-11-17T01:44:45.923Z",
+        "reason": "User asked for a gradient on the Rankin title letters so the sheen follows the glyphs."
       }
     ]
   }

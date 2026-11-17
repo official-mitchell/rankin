@@ -115,6 +115,7 @@ export type ClientMessageType =
   | "host.addPitch"
   | "host.updatePitch"
   | "host.removePitch"
+  | "host.reorderPitches"
   | "host.setStatus"
   | "host.startPitching"
   | "host.openVoting"

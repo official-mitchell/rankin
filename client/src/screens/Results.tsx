@@ -1,4 +1,4 @@
-// Borda headline, score bars, flags, and counted versus voided names (checklist 10.1).
+// Borda headline, score bars, flags, and counted versus voided names (checklist 10.1). A closed poll can return to the landing screen to create another session.
 import type { CategoryStats, PitchResult, Results } from "@we-rankin/shared";
 
 export type ResultPitch = { id: string; title: string };
@@ -46,10 +46,12 @@ export function ResultsBoard({
   results,
   pitches,
   players,
+  onNewSession,
 }: {
   results: Results;
   pitches: ResultPitch[];
   players: ResultPlayer[];
+  onNewSession?: () => void;
 }) {
   const titleOf = new Map(pitches.map((pitch) => [pitch.id, pitch.title]));
   const borda = [...results.pitches].sort((left, right) => left.bordaRank - right.bordaRank || right.borda - left.borda);
@@ -58,6 +60,11 @@ export function ResultsBoard({
 
   return (
     <div className="row results">
+      {onNewSession ? (
+        <button type="button" className="btn btn--primary btn--block" onClick={onNewSession}>
+          Create a new session
+        </button>
+      ) : null}
       <section className="panel panel--quiet">
         <p className="eyebrow">★ Polls closed ★</p>
         <p className="label">Counted</p>

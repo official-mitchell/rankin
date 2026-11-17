@@ -123,3 +123,4 @@ After the host accepts the shots:
 
 - 2026-11-16: Created from host review of the running landing screen. Decisions recorded: drop Live on landing, name the product Rankin' with a star on each side, make phase a progress mark, replace the Borda tagline with a first-visit rules dialog, hide the create key until someone elects to be game master, and remove Notes / Rank / Players from the empty landing.
 - 2026-11-16: Steps 1–5 implemented in the client shell and landing. New shot scenes: `landing` (dialog), `landing-ready`, `landing-host`.
+- 2026-11-16: Landing is two buttons with no panel: Become the Game Master starts a session with no typed key. Join a game accepts a full link or a bare session code. The shared CREATE_KEY check on POST /api/sessions is no longer required.

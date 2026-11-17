@@ -1,7 +1,9 @@
-// Landing and the created-session card. 2026-11-16: first visit explains Rankin'. The create key stays hidden until someone elects to be the game master. A rejected key says it is the game master's secret.
+// Landing and the created-session card.
+// 2026-11-16: two open buttons, Become the Game Master and Join a game. No create-key field. A pasted link or a bare session code both open the session. The join form can return to those two buttons. The choice screen explains who starts a session and who joins one. The ready card can regenerate the code or replace it with a 6-character name.
 import { useEffect, useState, type FormEvent } from "react";
-import { hostSecretKey } from "../host-secret";
-import { hostLinkKey, sessionLinks } from "./links";
+import { CODE_ALPHABET, CODE_LENGTH } from "@we-rankin/shared";
+import { forgetSession, hostSecretKey, sessionEditedAt, touchSession } from "../host-secret";
+import { hostLinkKey, sessionLinks, sessionTarget } from "./links";
 
 export type CreatedSession = { code: string; player: string; host: string };
 export const INTRO_KEY = "rankin-intro-seen";
@@ -20,27 +22,24 @@ export function Landing({
   initialError = "",
   initialCreated = null,
   intro = "auto",
-  hosting: hostingInitial = false,
+  joining = false,
   onEnter,
 }: {
   createSession?: (createKey: string) => Promise<Response>;
   initialError?: string;
   initialCreated?: CreatedSession | null;
   intro?: "auto" | "open" | "closed";
-  hosting?: boolean;
+  joining?: boolean;
   onEnter?: (path: string) => void;
 }) {
-  const [createKey, setCreateKey] = useState("");
   const [error, setError] = useState(initialError);
   const [created, setCreated] = useState<CreatedSession | null>(initialCreated);
   const [copied, setCopied] = useState("");
-  const [introOpen, setIntroOpen] = useState(intro !== "closed" && initialCreated === null);
-  const [hosting, setHosting] = useState(hostingInitial || initialError.length > 0);
-
-  useEffect(() => {
-    if (intro !== "auto" || initialCreated) return;
-    if (window.localStorage.getItem(INTRO_KEY) === "1") setIntroOpen(false);
-  }, [intro, initialCreated]);
+  const [introOpen, setIntroOpen] = useState(intro === "open");
+  const [mode, setMode] = useState<"choose" | "join">(joining ? "join" : "choose");
+  const [link, setLink] = useState("");
+  const [sessionName, setSessionName] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!introOpen) return;
@@ -56,24 +55,47 @@ export function Landing({
     setIntroOpen(false);
   }
 
-  async function onSubmit(event: FormEvent): Promise<void> {
-    event.preventDefault();
+  async function onCreate(codes?: string[]): Promise<void> {
     setError("");
-    const response = await (createSession ?? defaultCreate)(createKey);
-    const failure = createFailure(response.status);
-    if (failure) {
-      setError(failure);
+    setBusy(true);
+    try {
+      const response = codes ? await createNamed(codes) : await (createSession ?? defaultCreate)("");
+      const failure = createFailure(response.status);
+      if (failure || !response.ok) {
+        setError(failure ?? "The session could not be created.");
+        return;
+      }
+      const body = (await response.json()) as { code: string; hostSecret: string };
+      const links = sessionLinks(window.location.origin, body.code, body.hostSecret);
+      window.localStorage.setItem(hostSecretKey(body.code), body.hostSecret);
+      window.localStorage.setItem(hostLinkKey(body.code), links.host);
+      touchSession(body.code, window.localStorage);
+      setCreated({ code: body.code, ...links });
+      setSessionName("");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function onName(event: FormEvent): void {
+    event.preventDefault();
+    const code = sessionName.trim().toUpperCase();
+    if (code.length !== CODE_LENGTH || [...code].some((char) => !CODE_ALPHABET.includes(char))) {
+      setError("Use 6 letters or numbers. Skip I, L, O, 0, and 1.");
       return;
     }
-    if (!response.ok) {
-      setError("The session could not be created.");
+    void onCreate([code]);
+  }
+
+  function onJoin(event: FormEvent): void {
+    event.preventDefault();
+    const target = sessionTarget(link);
+    if (!target) {
+      setError("Paste the game link, or the session code from that link.");
       return;
     }
-    const body = (await response.json()) as { code: string; hostSecret: string };
-    const links = sessionLinks(window.location.origin, body.code, body.hostSecret);
-    window.localStorage.setItem(hostSecretKey(body.code), body.hostSecret);
-    window.localStorage.setItem(hostLinkKey(body.code), links.host);
-    setCreated({ code: body.code, ...links });
+    setError("");
+    onEnter?.(target);
   }
 
   async function copy(value: string): Promise<void> {
@@ -84,40 +106,73 @@ export function Landing({
   if (created) {
     return (
       <section className="panel panel--inset-frame panel--metal row" data-scene="created">
-        <p className="eyebrow">Session ready</p>
+        <p className="eyebrow eyebrow--center">Session ready</p>
         <div className="code-plate">
           <div className="code-plate__code">{created.code}</div>
         </div>
+        <button type="button" className="btn btn--ghost btn--block" disabled={busy} onClick={() => void onCreate()}>
+          Regenerate code
+        </button>
+        <form className="row" onSubmit={onName}>
+          <div className="field">
+            <label className="label-caps" htmlFor="session-name">
+              Session name
+            </label>
+            <input
+              id="session-name"
+              className="input"
+              value={sessionName}
+              placeholder="6 letters or numbers"
+              autoComplete="off"
+              maxLength={CODE_LENGTH}
+              onChange={(event) => setSessionName(event.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn--secondary btn--block" disabled={busy}>
+            Name the session
+          </button>
+        </form>
+        {error ? (
+          <p className="toast" role="alert">
+            {error}
+          </p>
+        ) : null}
         <p className="notice">Save the host link</p>
-        <p className="label">Player link</p>
+        <p className="label">Player Link:</p>
         <p className="link-line">{created.player}</p>
         <button type="button" className="btn btn--secondary btn--block" data-copy={created.player} onClick={() => void copy(created.player)}>
           Copy player link
         </button>
-        <p className="label">Host link</p>
+        <p className="label">Host Link:</p>
         <p className="link-line">{created.host}</p>
         <button type="button" className="btn btn--secondary btn--block" data-copy={created.host} onClick={() => void copy(created.host)}>
           Copy host link
         </button>
         {copied ? <p className="label">Copied</p> : null}
-        <button type="button" className="btn btn--primary btn--block" onClick={() => onEnter?.(`/s/${created.code}`)}>
-          Enter session
+        <button type="button" className="btn btn--primary btn--block btn--spaced" onClick={() => onEnter?.(`/s/${created.code}`)}>
+          Create Session
         </button>
       </section>
     );
   }
 
   return (
-    <section className="panel panel--inset-frame panel--metal row" data-scene="landing">
+    <div className="row row--center" data-scene="landing">
       {introOpen ? <Intro onDismiss={dismissIntro} /> : null}
-      {introOpen ? null : hosting ? (
-        <form className="row" onSubmit={(event) => void onSubmit(event)}>
-          <p className="label">This key proves you are the game master.</p>
+      {mode === "join" ? (
+        <form className="row" onSubmit={onJoin}>
           <div className="field">
-            <label className="label-caps" htmlFor="create-key">
-              Create key
+            <label className="label-caps" htmlFor="game-link">
+              Game link
             </label>
-            <input id="create-key" className="input" type="password" value={createKey} onChange={(event) => setCreateKey(event.target.value)} autoComplete="off" />
+            <input
+              id="game-link"
+              className="input"
+              value={link}
+              placeholder="Paste the link or the session code"
+              autoComplete="off"
+              onChange={(event) => setLink(event.target.value)}
+            />
           </div>
           {error ? (
             <p className="toast" role="alert">
@@ -125,20 +180,34 @@ export function Landing({
             </p>
           ) : null}
           <button type="submit" className="btn btn--primary btn--block">
-            Create session
+            Join a game
+          </button>
+          <button
+            type="button"
+            className="btn btn--ghost btn--block"
+            onClick={() => {
+              setError("");
+              setMode("choose");
+            }}
+          >
+            Become the Game Master
           </button>
         </form>
       ) : (
-        <div className="row">
-          <button type="button" className="btn btn--primary btn--block" onClick={() => setHosting(true)}>
-            Become the game master
+        <>
+          <p className="lead">
+            A game master starts the session and runs it through the results. Everyone else joins with the game link or the session code.
+          </p>
+          <button type="button" className="btn btn--primary btn--block" disabled={busy} onClick={() => void onCreate()}>
+            Become the Game Master
           </button>
-          <button type="button" className="btn btn--secondary btn--block" onClick={() => setIntroOpen(true)}>
-            How Rankin' works
+          <button type="button" className="btn btn--join btn--block" onClick={() => { setError(""); setMode("join"); }}>
+            Join a game
           </button>
-        </div>
+          <SavedSessions {...(onEnter ? { onEnter } : {})} />
+        </>
       )}
-    </section>
+    </div>
   );
 }
 
@@ -173,10 +242,59 @@ export function createFailure(status: number): string | null {
   return null;
 }
 
-function defaultCreate(createKey: string): Promise<Response> {
+function savedSessionCodes(): string[] {
+  const prefix = "we-rankin:host:";
+  const codes: string[] = [];
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index) ?? "";
+    if (key.startsWith(prefix)) codes.push(key.slice(prefix.length));
+  }
+  return codes.sort((left, right) => (sessionEditedAt(right, window.localStorage) ?? 0) - (sessionEditedAt(left, window.localStorage) ?? 0));
+}
+
+function SavedSessions({ onEnter }: { onEnter?: (path: string) => void }) {
+  const [codes, setCodes] = useState(savedSessionCodes);
+  if (codes.length === 0) return null;
+  return (
+    <section className="panel panel--quiet row">
+      <p className="eyebrow">Sessions on this device</p>
+      {codes.map((code) => {
+        const edited = sessionEditedAt(code, window.localStorage);
+        return (
+          <div key={code} className="row">
+            <button type="button" className="btn btn--secondary btn--block" onClick={() => onEnter?.(`/s/${code}`)}>
+              Rejoin {code}
+            </button>
+            <p className="label">{edited ? `Last edited ${new Date(edited).toLocaleString()}` : "Last edited unknown"}</p>
+            <button
+              type="button"
+              className="btn btn--ghost btn--block"
+              onClick={() => {
+                forgetSession(code, window.localStorage);
+                setCodes(savedSessionCodes());
+              }}
+            >
+              Remove {code}
+            </button>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+function defaultCreate(_createKey: string): Promise<Response> {
   return fetch("/api/sessions", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ createKey }),
+    body: JSON.stringify({}),
+  });
+}
+
+function createNamed(codes: string[]): Promise<Response> {
+  return fetch("/api/sessions", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ codes }),
   });
 }

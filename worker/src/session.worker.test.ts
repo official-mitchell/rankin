@@ -84,13 +84,7 @@ describe("Session durable object", () => {
     expect(probe).toEqual({ duplicateName: true, scoreRange: true, upsert: 4 });
   });
 
-  it("creates a session only with the right key and retries a forced collision", async () => {
-    const wrong = await SELF.fetch("https://we-rankin.test/api/sessions", {
-      method: "POST",
-      body: JSON.stringify({ createKey: "nope-nope-nope" }),
-    });
-    expect(wrong.status).toBe(401);
-
+  it("creates a session without a typed key and retries a forced collision", async () => {
     const minted = await create();
     expect(minted.code).toMatch(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
     const first = await create(["AAAAAA"]);
@@ -199,7 +193,7 @@ describe("Session durable object", () => {
     voter.ws.send(JSON.stringify({ type: "join", name: "Bea", clientSeq: 1 }));
     await voter.box.waitFor((message) => message.type === "ack");
     voter.ws.send(JSON.stringify({ type: "setScore", pitchId: other, category: "funniness", value: 3, clientSeq: 2 }));
-    expect((await voter.box.waitFor((message) => message.clientSeq === 2)).code).toBe("bad_transition");
+    expect((await voter.box.waitFor((message) => message.clientSeq === 2)).type).toBe("ack");
 
     const cara = await hello(created.code);
     cara.ws.send(JSON.stringify({ type: "join", name: "Cara", clientSeq: 1 }));

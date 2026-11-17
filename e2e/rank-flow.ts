@@ -1,13 +1,6 @@
 // Drag handle, move buttons, and a late pitch badge (checklist 9).
 import { spawn, type ChildProcess } from "node:child_process";
-import { readFileSync } from "node:fs";
 import { chromium, type Page } from "playwright";
-
-function createKey(): string {
-  const line = readFileSync(".dev.vars", "utf8").split("\n").find((entry) => entry.startsWith("CREATE_KEY="));
-  if (!line) throw new Error("CREATE_KEY is missing");
-  return line.slice("CREATE_KEY=".length).trim();
-}
 
 function start(command: string, args: string[]): ChildProcess {
   return spawn(command, args, { stdio: "inherit" });
@@ -39,9 +32,8 @@ try {
   await waitFor("http://127.0.0.1:5173/");
   const host = await browser.newPage();
   await host.goto("http://127.0.0.1:5173/");
-  await host.locator("#create-key").fill(createKey());
-  await host.getByRole("button", { name: "Create session" }).click();
-  await host.getByRole("button", { name: "Enter session" }).click();
+  await host.getByRole("button", { name: "Become the Game Master" }).click();
+  await host.getByRole("button", { name: "Create Session" }).click();
   await host.getByRole("textbox", { name: "Your name" }).fill("Ada");
   await host.getByRole("button", { name: "Join", exact: true }).click();
   const session = host.url();

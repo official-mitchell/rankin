@@ -1,36 +1,45 @@
-/* App shell. 2026-11-16: phase rail is an unmarked progress sequence. app--solo drops the space reserved for the bottom tabs. */
+/* App shell. 2026-11-16: phase rail is an unmarked progress sequence. app--solo drops the space reserved for the bottom tabs. The shell fills the viewport so the landing choices can sit in the open space under the phase rail. */
 .app {
   position: relative;
   z-index: 1;
   max-width: 430px;
-  min-height: 100%;
+  min-height: 100dvh;
   margin: 0 auto;
   padding: var(--space-4);
-  padding-bottom: calc(56px + var(--space-4) + env(safe-area-inset-bottom));
+  padding-bottom: calc(72px + var(--space-4) + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   overscroll-behavior: contain;
 }
 .app--solo { padding-bottom: var(--space-4); }
-.star { display: inline-block; width: 0.8em; height: 0.8em; background: var(--red-400); flex: none;
+.star { display: inline-block; width: 0.8em; height: 0.8em; background: var(--red-400); flex: none; animation: star-bounce 1.6s ease-in-out infinite;
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.title .star:last-child { animation-delay: 0.25s; }
+@keyframes title-shine { to { background-position: 0% 0; } }
+@keyframes star-bounce { 50% { transform: translateY(-5px); } }
 
-.app-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 56px; }
-.app-header .title { font: 400 24px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-gold); margin: 0; display: flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
-.conn { white-space: nowrap; flex: none; display: inline-flex; align-items: center; gap: var(--space-2); min-height: 32px; padding: 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--bg-control); font-size: var(--type-label); font-weight: 600; color: var(--text-secondary); }
+.app-header { position: relative; display: flex; align-items: center; justify-content: center; gap: var(--space-3); min-height: 72px; }
+.app-header .title { font: 400 40px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-gold); margin: 0; display: flex; align-items: center; gap: var(--space-2); white-space: nowrap; }
+.title__word { color: transparent; background-image: linear-gradient(100deg, var(--text-gold) 0%, var(--text-gold) 32%, #fff6d0 50%, var(--text-gold) 68%, var(--text-gold) 100%); background-size: 220% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; animation: title-shine 2.8s linear infinite; }
+.conn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); white-space: nowrap; flex: none; display: inline-flex; align-items: center; gap: var(--space-2); min-height: 32px; padding: 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); background: var(--bg-control); font-size: var(--type-label); font-weight: 600; color: var(--text-secondary); }
 .led { width: 10px; height: 10px; border-radius: 50%; background: var(--green-300); flex: none; }
 
-.phase-rail { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; padding: 0; list-style: none; }
-.phase-rail::before { content: ""; position: absolute; left: 12%; right: 12%; top: 8px; height: 2px; background: var(--border-strong); }
-.phase-rail__step { min-height: 48px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font: 400 13px/1.1 var(--font-display); letter-spacing: 0.02em; text-transform: uppercase; color: var(--text-disabled); }
-.phase-rail__mark { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--text-disabled); background: var(--bg-canvas); position: relative; z-index: 1; }
+.back-link { align-self: flex-start; margin: 0 0 var(--space-2); padding: 8px 0; border: 0; background: transparent; color: var(--text-gold); font: 500 15px/1 var(--font-body); }
+.phase-rail { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; padding: 0; list-style: none; overflow: hidden; }
+.phase-rail::before { content: ""; position: absolute; left: 12.5%; right: 12.5%; top: 9px; height: 2px; background: var(--border-strong); }
+.phase-rail::after { content: ""; position: absolute; left: 12.5%; top: 7px; width: 22%; height: 6px; border-radius: 3px; background: linear-gradient(90deg, transparent, var(--gold-200), transparent); animation: rail-run 2.4s linear infinite; pointer-events: none; }
+.phase-rail__step { min-height: 56px; text-align: center; font: 400 13px/1.1 var(--font-display); letter-spacing: 0.02em; text-transform: uppercase; color: var(--text-disabled); }
+.phase-rail__hit { width: 100%; min-height: 56px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; }
+.phase-rail__mark { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--text-disabled); background: var(--bg-canvas); position: relative; z-index: 1; }
+@keyframes rail-run { from { transform: translateX(0); } to { transform: translateX(340%); } }
 .phase-rail__step--done { color: var(--text-muted); }
 .phase-rail__step--done .phase-rail__mark { background: var(--gold-400); border-color: var(--gold-400); }
 .phase-rail__step--active { color: var(--text-gold); }
 .phase-rail__step--active .phase-rail__mark { background: var(--red-400); border-color: var(--gold-400); }
 
-.screen { display: flex; flex-direction: column; gap: var(--space-3); }
+.screen { display: flex; flex-direction: column; gap: var(--space-3); flex: 1; }
+.row--center { margin-block: auto; padding-block: var(--space-8); }
 .screen p { margin: 0; color: var(--text-secondary); }
 .alert-banner { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: var(--red-800); color: var(--gold-050); border: 1px solid var(--border-gold); border-radius: var(--radius-md); }
 .alert-banner p { color: var(--gold-050); }
@@ -39,7 +48,9 @@
 .queue-lab { display: flex; flex-direction: column; gap: var(--space-2); }
 
 .tabbar { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(430px, 100%); display: grid; grid-template-columns: repeat(3, 1fr); background: var(--bg-inset); border-top: 1px solid var(--border-gold); padding-bottom: env(safe-area-inset-bottom); z-index: 2; }
-.tab { min-height: 56px; display: grid; place-items: center; background: transparent; border: 0; color: var(--text-gold); font: 400 14px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.tab { min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; border: 0; color: var(--text-gold); font: 400 14px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.tab:disabled { opacity: 0.35; }
+.tab small { font: 600 13px/1 var(--font-body); letter-spacing: 0.02em; text-transform: none; color: var(--text-secondary); }
 .tab--active { background: var(--red-800); color: var(--gold-050); box-shadow: inset 0 3px 0 var(--border-gold); }
 
 .is-frozen, .is-frozen * { animation: none !important; transition: none !important; }

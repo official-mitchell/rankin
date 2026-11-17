@@ -83,16 +83,7 @@ export function RankList({
       </DndContext>
       <section className={`panel submit-bar ${missing.length === 0 ? "submit-bar--ready" : ""}`}>
         {submitted ? <p className="notice">Submitted ✓ — edits still save</p> : null}
-        {missing.length > 0 ? (
-          <ul className="missing">
-            {missing.map((item) => (
-              <li key={`${item.kind}-${item.pitchId}-${item.kind === "score" ? item.category : "place"}`}>
-                <a href={`#pitch-${item.pitchId}`}>{missingLabel(item, pitches)} <span>Jump ›</span></a>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <button type="button" className="btn btn--primary btn--block" disabled={locked || missing.length > 0} onClick={() => onWrite?.({ type: "submitBallot" })}>
+        <button type="button" className="btn btn--primary btn--block btn--ballot" disabled={locked} onClick={() => onWrite?.({ type: "submitBallot" })}>
           Submit ballot
         </button>
       </section>
@@ -154,7 +145,13 @@ function RankCard({
             </b>
           ))}
         </div>
-        {chipLabels.length > 0 ? <p className="label">{chipLabels.join(", ")}</p> : null}
+        {chipLabels.length > 0 ? (
+          <ul className="rank__chips">
+            {chipLabels.map((label) => (
+              <li key={label}>{label}</li>
+            ))}
+          </ul>
+        ) : null}
         {isNew ? (
           <button type="button" className="btn btn--gold" disabled={locked} onClick={onPlace}>
             Place here

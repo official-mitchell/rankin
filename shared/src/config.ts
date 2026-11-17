@@ -1,4 +1,4 @@
-// Seed config for checklist 2.1. Chip copy is the PRD v0.2 seed list.
+// Seed config for checklist 2.1. Chip labels are the host's current investable and cautious lists.
 import type { CategoryId } from "./types";
 
 export const NAME_MIN = 1;
@@ -34,23 +34,29 @@ export type ChipGroupId = "investable" | "cautious";
 export type Chip = { id: string; label: string; group: ChipGroupId };
 
 const INVESTABLE_LABELS = [
-  "Huge market",
-  "Sticky recurring revenue",
-  "Defensible moat",
-  "Killer founder energy",
-  "Scales absurdly fast",
-  "Clear first customer",
-  "Pitch was airtight",
+  "Huge Market Opportunity",
+  "Sticky Recurring Revenues",
+  "Defensible Moat",
+  "First-Mover",
+  "Scales Fast",
+  "Clear First Customer",
+  "Strong Business Plan",
+  "Novelty",
+  "Economics are Strong",
+  "Good Tech",
+  "Appeals to Humanity's Worst Impulses",
+  "Dastardly Ingenious",
+  "Downright Hilarious",
 ] as const;
 
 const CAUTIOUS_LABELS = [
-  "Lawsuit magnet",
-  "Unit economics are fiction",
-  "Regulators will notice",
-  "Founder is the risk",
-  "Zero repeat customers",
-  "Reputationally radioactive",
-  "Execution nightmare",
+  "Insiders Might Leak",
+  "Operational Security Unclear",
+  "Unclear Market Adoption",
+  "Not Sure If It's Big Enough",
+  "Regulatory Avoidance Not Accounted For",
+  "Zero Repeat Customers",
+  "Execution Nightmare",
 ] as const;
 
 function chipId(label: string): string {

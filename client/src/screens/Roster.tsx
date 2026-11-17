@@ -1,4 +1,4 @@
-// Lobby roster and lineup (checklist 6.3). Host roster actions hide once closed (checklist 10.2).
+// Lobby roster (checklist 6.3). Host roster actions hide once closed (checklist 10.2). Pitch order lives on the pitch cards.
 import type { Phase, PlayerRole } from "@we-rankin/shared";
 import { useState } from "react";
 
@@ -16,7 +16,7 @@ type Confirm = { action: "promote" | "remove" | "release"; name: string } | null
 
 export function Roster({
   players,
-  pitches,
+  pitches: _pitches,
   isHost,
   spectator,
   phase,
@@ -33,12 +33,6 @@ export function Roster({
   return (
     <div className="row" data-host={isHost ? "yes" : "no"}>
       {spectator ? <p className="notice">You joined after roster lock — view only</p> : null}
-      {isHost ? (
-        <section className="panel panel--inset-frame row">
-          <p className="eyebrow">Host link is saved on this device</p>
-          <p className="link-line">Phase controls sit in the host bar.</p>
-        </section>
-      ) : null}
       <section className="panel panel--quiet">
         <ul className="roster">
           {players.map((player) => (
@@ -66,20 +60,6 @@ export function Roster({
                   </button>
                 </span>
               ) : null}
-            </li>
-          ))}
-        </ul>
-      </section>
-      <section className="panel panel--quiet">
-        <p className="eyebrow">Lineup</p>
-        <ul className="roster">
-          {pitches.length === 0 ? <li><span className="roster__name">No pitches yet</span></li> : null}
-          {pitches.map((pitch) => (
-            <li key={pitch.id}>
-              <span className="roster__name">
-                {pitch.title}
-                <span className="label"> · {pitch.presenterName}</span>
-              </span>
             </li>
           ))}
         </ul>

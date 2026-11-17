@@ -34,7 +34,7 @@ describe("config", () => {
     const seen = new Set<string>();
     for (const group of Object.values(CHIP_GROUPS)) {
       expect(group.length).toBeGreaterThanOrEqual(5);
-      expect(group.length).toBeLessThanOrEqual(8);
+      expect(group.length).toBeLessThanOrEqual(16);
       for (const chip of group) {
         expect(seen.has(chip.id)).toBe(false);
         seen.add(chip.id);

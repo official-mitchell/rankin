@@ -87,13 +87,13 @@ export default function FixtureScreen({ scene }: { scene: string }) {
     return sceneFrame(scene, "lobby", <Landing intro="closed" createSession={async () => new Response(null, { status: 204 })} />, bare);
   }
   if (scene === "landing-host") {
-    return sceneFrame(scene, "lobby", <Landing intro="closed" hosting createSession={async () => new Response(null, { status: 204 })} />, bare);
+    return sceneFrame(scene, "lobby", <Landing intro="closed" joining />, bare);
   }
   if (scene === "create-key-error") {
     return sceneFrame(
       scene,
       "lobby",
-      <Landing intro="closed" hosting initialError="That create key was not accepted. Only the game master has this key." createSession={async () => new Response(null, { status: 401 })} />,
+      <Landing intro="closed" joining initialError="Paste the game link, or the session code from that link." />,
       bare,
     );
   }

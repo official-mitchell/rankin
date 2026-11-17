@@ -19,6 +19,7 @@ export type WriteBody =
   | { type: "host.addPitch"; title: string; presenterName: string; presenterPlayerId: string | null }
   | { type: "host.updatePitch"; pitchId: string; title?: string; presenterName?: string; presenterPlayerId?: string | null }
   | { type: "host.removePitch"; pitchId: string }
+  | { type: "host.reorderPitches"; pitchIds: string[] }
   | { type: "host.setStatus"; pitchId: string; status: "upcoming" | "presenting" | "done" };
 
 export type PendingWrite = {
@@ -38,6 +39,11 @@ export function applyOptimistic(view: ClientView, body: WriteBody): ClientView {
     );
     scores.push({ playerId: view.self.playerId, pitchId: body.pitchId, category: body.category, value: body.value });
     return { ...view, scores };
+  }
+  if (body.type === "host.reorderPitches") {
+    const byId = new Map((view.pitches ?? []).map((pitch) => [pitch.id, pitch]));
+    const pitches = body.pitchIds.map((id) => byId.get(id)).filter((pitch) => pitch !== undefined);
+    return { ...view, pitches };
   }
   if (body.type === "setChips") {
     const chips = (view.chips ?? []).filter((set) => set.pitchId !== body.pitchId);

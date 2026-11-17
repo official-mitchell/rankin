@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { readPlayerId, writePlayerId } from "./identity";
 import { Landing, createFailure } from "./Landing";
-import { sessionLinks } from "./links";
+import { sessionLinks, sessionTarget } from "./links";
 import { exportShapeErrors } from "./export-shape";
 import { HostConsole, pitchTitleError, unsubmittedNames } from "./HostConsole";
 import { applyMove } from "@we-rankin/shared";
@@ -20,18 +20,23 @@ describe("session screens", () => {
     const markup = renderToStaticMarkup(
       createElement(Landing, {
         intro: "closed",
-        hosting: true,
-        initialError: "That create key was not accepted. Only the game master has this key.",
-        createSession: async () => new Response(null, { status: 401 }),
+        joining: true,
+        initialError: "Paste the game link, or the session code from that link.",
       }),
     );
-    expect(markup).toContain("That create key was not accepted. Only the game master has this key.");
+    expect(markup).toContain("Paste the game link, or the session code from that link.");
+    expect(markup).toContain("Become the Game Master");
     const firstVisit = renderToStaticMarkup(createElement(Landing, { intro: "open" }));
     expect(firstVisit).toContain("A game master starts the session.");
     expect(firstVisit).not.toContain("create-key");
     const ready = renderToStaticMarkup(createElement(Landing, { intro: "closed" }));
-    expect(ready).toContain("Become the game master");
+    expect(ready).toContain("Become the Game Master");
+    expect(ready).toContain("Join a game");
+    expect(ready).not.toContain("panel--metal");
     expect(ready).not.toContain("id=\"create-key\"");
+    expect(sessionTarget("https://we-rankin.test/s/AbCdEf#h=secret")).toBe("/s/ABCDEF#h=secret");
+    expect(sessionTarget("ABCDEF")).toBe("/s/ABCDEF");
+    expect(sessionTarget("not a link")).toBeNull();
   });
 
   it("puts the exact player and host links on the copy buttons", () => {
@@ -127,7 +132,8 @@ describe("session screens", () => {
     ];
     const empty = renderToStaticMarkup(createElement(Notes, { phase: "pitching", selfId: "ada", pitches, scores: [], chips: [] }));
     expect(empty).toContain("Your pitch — no scoring");
-    expect(empty).toContain("Coming up");
+    expect(empty).toContain("Submit scores");
+    expect(empty).not.toContain("Unlocks when presenting");
     expect(empty).not.toContain('aria-pressed="true"');
     const filled = renderToStaticMarkup(
       createElement(Notes, {
@@ -143,10 +149,9 @@ describe("session screens", () => {
         saved: true,
       }),
     );
-    expect(filled).toContain("1/1 scored");
-    expect(filled).toContain("Saved");
+    expect(filled).toContain("1 of 2 pitches scored");
     expect(filled).toContain('aria-pressed="true"');
-    expect(progressCount(pitches, [], "pitching", "ada")).toEqual({ done: 0, total: 1 });
+    expect(progressCount(pitches, [], "pitching", "ada")).toEqual({ done: 0, total: 2 });
     expect(toggleChip(["huge-market"], "huge-market")).toEqual([]);
     expect(toggleChip([], "huge-market")).toEqual(["huge-market"]);
   });

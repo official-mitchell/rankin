@@ -160,7 +160,7 @@ try {
   // Bea ranks Beta, Gamma, Delta. Cam ranks Alpha, Beta, Gamma, Delta. Dee does not submit.
   // Borda: Alpha 1, Beta (1 + 2/3) / 2, Gamma (1/2 + 1/3) / 2, Delta 0.
   const expected = ["Alpha", "Beta", "Gamma", "Delta"];
-  const shown = await host.locator("[data-rank] h4").allTextContents();
+  const shown = await host.locator("[data-rank] .card-title").allTextContents();
   if (shown.join(",") !== expected.join(",")) throw new Error(`board ${shown.join(",")} expected ${expected.join(",")}`);
 
   console.log("e2e lobby through closed matched the fixture board");
